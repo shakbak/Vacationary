@@ -25,17 +25,14 @@ A vacation **lodging** recommendation assistant.
 
 Assistant and recommendation are **not** their own processes; they live in the backend core.
 
-## Spec files
+## Spec files (one per service)
 
-| File | Part | Role |
+| File | Service | Role |
 |---|---|---|
-| [system-behavior.md](system-behavior.md) | Whole system | Shared outcomes and turn flow for every channel |
-| [backend.md](backend.md) | Backend core | Shared API, conversations, isolation, assistant + search |
-| [recommendation.md](recommendation.md) | Recommendation | Stay search and 5-result payload with OTA links (in the backend) |
-| [assistant.md](assistant.md) | Assistant | LLM understands the user, fills destination, calls recommendation (in the backend) |
-| [messaging.md](messaging.md) | Messaging platforms service | Separate Java service for external messaging APIs |
-| [whatsapp.md](whatsapp.md) | WhatsApp adapter | Only implemented platform, inside the messaging service |
+| [backend.md](backend.md) | Backend core | Conversations, assistant, recommendation, shared API |
+| [messaging.md](messaging.md) | Messaging platforms | Separate Java service; WhatsApp is the only v1 adapter |
 | [web.md](web.md) | Web client | React/TypeScript chat UI for the same assistant |
+| [system-behavior.md](system-behavior.md) | Whole system | Shared outcomes and turn flow across services |
 
 ## How to read a file
 

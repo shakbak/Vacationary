@@ -2,7 +2,7 @@
 
 Lightweight React and TypeScript chat UI. Users message the **same** assistant as on WhatsApp, through the shared backend. This client renders conversations; it does not search stays or call the LLM.
 
-Product behavior matches [assistant.md](assistant.md) and [recommendation.md](recommendation.md): English, destination required, optional extras, five lodging results with OTA links.
+Product behavior matches the assistant and recommendation rules in [backend.md](backend.md): English, destination required, optional extras, five lodging results with OTA links.
 
 ## Must have
 
