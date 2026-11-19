@@ -9,7 +9,7 @@ LLM-backed assistant that understands English lodging requests, keeps conversati
 - A-01. The assistant SHALL use an LLM to understand the user and to compose the reply.
 - A-02. The assistant SHALL have **at least one tool**: lodging search, as specified in [recommendation.md](recommendation.md).
 - A-03. A simple single-agent loop is sufficient. Multiple agents and advanced orchestration are not required.
-- A-04. The assistant SHALL be channel-agnostic. It consumes conversation history + latest user text and produces a structured outcome. It SHALL NOT format WhatsApp protocol payloads.
+- A-04. The assistant SHALL be channel-agnostic. It consumes conversation history + latest user text and produces a structured outcome. It SHALL NOT format WhatsApp (or other messaging-platform) protocol payloads. Those belong in the messaging platforms service.
 
 ### Language
 
@@ -25,7 +25,7 @@ LLM-backed assistant that understands English lodging requests, keeps conversati
 
 ### Using recommendations
 
-- A-11. After a successful search, the assistant outcome SHALL include the 5 structured options from the tool **and** English text the user can read on WhatsApp, including the OTA links.
+- A-11. After a successful search, the assistant outcome SHALL include the 5 structured options from the tool **and** English text any channel can show, including the OTA links.
 - A-12. The assistant SHALL NOT invent stays that the tool did not return. Names, prices, ratings, and URLs in the reply SHALL come from the tool payload.
 - A-13. If the user asks for non-lodging help (flights, tours), the assistant SHALL refuse that scope and offer lodging help instead.
 

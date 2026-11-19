@@ -1,6 +1,6 @@
 # Recommendation
 
-Domain service that turns a stay search into five lodging options with OTA links. The assistant calls this as its required tool. Local sample data is allowed.
+Stay-search logic that turns a request into five lodging options with OTA links. The assistant calls this as its required tool. It runs **inside the backend core**, not as its own process. Local sample data is allowed.
 
 ## Must have
 

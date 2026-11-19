@@ -1,18 +1,20 @@
 # Backend core
 
-Shared Java Spring backend used by WhatsApp now and by a web client later. This service owns conversations, user isolation, and the channel-agnostic application API. It does not own WhatsApp webhook details or how a message looks on a phone.
+Shared Java Spring backend used by the **web client** and by the **messaging platforms service**. This service owns conversations, user isolation, the assistant, and recommendation search. It does not own messaging-platform webhooks or how a message looks on WhatsApp.
+
+This is a **different Java process** from the messaging platforms service ([messaging.md](messaging.md)).
 
 ## Must have
 
 ### Platform
 
 - B-01. The backend SHALL be a Java Spring application.
-- B-02. The backend SHALL be the single assistant backend for all channels. WhatsApp and a future web client SHALL call the same conversation and assistant flow, not separate bots.
+- B-02. The backend SHALL be the single assistant backend for all channels. The web client and the messaging platforms service SHALL call the same conversation and assistant flow, not separate bots.
 
 ### Separation of channel vs assistant
 
-- B-03. Channel-specific integration (WhatsApp parse/send, later HTTP-for-React UI concerns) SHALL be separated from assistant logic and from recommendation search.
-- B-04. The backend SHALL expose a channel-agnostic application contract so a new client can be added without changing how conversations, the LLM, or stay search work.
+- B-03. External messaging-platform integration (parse webhook, send WhatsApp/Telegram/etc.) SHALL live in the messaging platforms service, not in this backend. The web UI SHALL live in the React client. This backend SHALL NOT depend on WhatsApp (or other platform) SDKs or payload types.
+- B-04. The backend SHALL expose a channel-agnostic application contract so a new web screen or a new messaging-platform adapter can be added without changing how conversations, the LLM, or stay search work.
 - B-05. That contract SHALL accept: channel identifier, external user id, inbound text, and a delivery/event id for idempotency.
 - B-06. That contract SHALL return: assistant-facing text plus the structured recommendation payload defined in [recommendation.md](recommendation.md) (or a clarification/error outcome with no results).
 
@@ -20,8 +22,8 @@ Shared Java Spring backend used by WhatsApp now and by a web client later. This 
 
 - B-07. The backend SHALL support follow-up messages in the same conversation. A later message such as “cheaper” or “near the beach” SHALL be handled with prior turns available as context.
 - B-08. The backend SHALL isolate conversations by channel + external user id. User A MUST NOT see or affect User B’s history, context, or recommendations.
-- B-09. One WhatsApp user SHALL map to one conversation (1:1). There is no Slack-style thread model in this product.
-- B-10. Connecting the same person’s WhatsApp conversation to a future web conversation is **not required**. Do not build account linking unless chosen later.
+- B-09. One WhatsApp user SHALL map to one conversation (1:1). There is no Slack-style thread model for the WhatsApp channel.
+- B-10. Connecting the same person’s WhatsApp conversation to a web conversation is **not required**. Do not build account linking unless chosen later.
 
 ### Storage
 
@@ -30,9 +32,9 @@ Shared Java Spring backend used by WhatsApp now and by a web client later. This 
 
 ### Failures (backend responsibility)
 
-- B-13. If the LLM, the recommendation tool, or channel delivery fails, the backend SHALL still produce a user-visible failure outcome (not a hang or empty success).
-- B-14. That outcome SHALL say what happened and how to proceed (for example retry, rephrase, or try later). Wording on WhatsApp is specified in [whatsapp.md](whatsapp.md).
-- B-15. Duplicate inbound events with the same delivery/event id SHALL NOT create a second user-visible reply or a second assistant run. (Required test target in the assignment.)
+- B-13. If the LLM or the recommendation tool fails, the backend SHALL still produce a user-visible failure outcome (not a hang or empty success). Delivery onto WhatsApp is the messaging service’s job after that.
+- B-14. That outcome SHALL say what happened and how to proceed (for example retry, rephrase, or try later). Platform wording on WhatsApp is specified in [whatsapp.md](whatsapp.md).
+- B-15. Duplicate inbound events with the same delivery/event id SHALL NOT create a second assistant run or a second logical reply. (Required test target in the assignment.)
 
 ### Tests the backend must make possible
 
@@ -57,11 +59,12 @@ The assignment requires a few focused tests of meaningful behavior. The backend 
 - Admin UI, analytics, or rate-limit product features.
 - Guaranteed persistence after restart (unless you later drop in-memory).
 - Matching a WhatsApp user to a web user.
+- Talking to the WhatsApp API (that is the messaging service).
 
 ## Acceptance
 
-- Two different WhatsApp users can talk at once and never receive each other’s context.
+- Two different users (including two WhatsApp users, via the messaging service) can talk at once and never receive each other’s context.
 - A user can send a destination, then a follow-up, and the second reply is clearly about the same trip.
 - A simulated LLM or search failure yields a clear error outcome through the application contract.
 - Replaying the same inbound event id does not duplicate the assistant reply.
-- A future web client could call the same contract without WhatsApp types leaking into assistant logic.
+- The web client and the messaging service can both call the same contract without WhatsApp types leaking into assistant logic.
