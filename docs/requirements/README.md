@@ -9,7 +9,9 @@ A vacation **lodging** recommendation assistant.
 - **In scope:** hotels, motels, vacation rentals, hostels, B&Bs, resorts.
 - **Out of scope:** flights, tours, attractions, restaurants, and any non-lodging booking.
 - **Coverage:** any city the user names. Sample/fake OTA links are allowed when live listings are unavailable.
-- **Required user input:** destination only. Dates, budget, guests, amenities, and stay type are optional and used when present.
+- **Required user input:** destination only. Dates, budget, **number of people**, amenities, and stay type are optional and used when present.
+- **Number of people:** total guests in the party (for example “4 people”). Used to prefer stays that can sleep that many. Not required; do not block a search just to ask for it.
+- **Nice to have (not committed):** special stay requests such as room type (double, twin, suite, family room) and how people split across rooms (for example 2+2, or a double plus a single).
 - **Conversation:** hybrid. Accept a full request in one message. If the destination is missing, ask for it (one question at a time). Do not block on optional fields.
 - **Language:** English only.
 - **Results:** 5 options per typical reply. Each option has name, stay type, location/area, price or price range, rating, short why, and an OTA listing link (Booking.com, Airbnb, or similar; real or sample URL).
@@ -33,6 +35,8 @@ Assistant and recommendation are **not** their own processes; they live in the b
 | [messaging.md](messaging.md) | Messaging platforms | Separate Java service; WhatsApp is the only v1 adapter |
 | [web.md](web.md) | Web client | React/TypeScript chat UI for the same assistant |
 | [system-behavior.md](system-behavior.md) | Whole system | Shared outcomes and turn flow across services |
+
+Backend **design** (how, not extra product scope): [docs/design/backend](../design/backend/overview.md).
 
 ## How to read a file
 

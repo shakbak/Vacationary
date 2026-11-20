@@ -47,10 +47,10 @@ LLM-backed assistant that understands English lodging requests, keeps conversati
 - A-04. The assistant SHALL be channel-agnostic. It consumes conversation history + latest user text and produces a structured outcome. It SHALL NOT format WhatsApp (or other messaging-platform) protocol payloads. Those belong in the messaging platforms service.
 - A-05. The assistant SHALL read and write **English only**. Non-English input is outside the product; it may reply in English that it only supports English.
 - A-06. If the user includes a destination in one message (with or without extras), the assistant SHALL search and recommend in that turn. It SHALL NOT ask a full questionnaire first.
-- A-07. If destination is missing or too vague to search (“somewhere warm”, “a hotel”), the assistant SHALL ask **one** clarifying question for the destination and wait. It SHALL NOT ask dates, budget, or guests in that same message as a requirement.
-- A-08. Dates, budget, guests, stay type, and amenities are optional. If the user provided them, the assistant SHALL pass them to search. If not, the assistant SHALL still search once destination is known.
+- A-07. If destination is missing or too vague to search (“somewhere warm”, “a hotel”), the assistant SHALL ask **one** clarifying question for the destination and wait. It SHALL NOT ask dates, budget, or number of people in that same message as a requirement.
+- A-08. Dates, budget, **number of people** (total guest count), stay type, and amenities are optional. If the user provided them, the assistant SHALL pass them to search. If not, the assistant SHALL still search once destination is known. Number of people is a first-class filter (for example “for 4”), not a buried note.
 - A-09. Clarifying questions SHALL be asked **one at a time**. For v1 the only blocking question is destination. Optional extras are not a gate.
-- A-10. Follow-up messages SHALL reuse trip context already collected (destination and any optional filters) unless the user clearly starts a new search (new city or “start over”).
+- A-10. Follow-up messages SHALL reuse destination and optional filters **already stated in prior messages of the same conversation**, unless the user clearly starts a new search (new city or “start over”). Do not keep a separate destination/filter snapshot beside the message list.
 - A-11. After a successful search, the assistant outcome SHALL include the 5 structured options from the tool **and** English text any channel can show, including the OTA links.
 - A-12. The assistant SHALL NOT invent stays that the tool did not return. Names, prices, ratings, and URLs in the reply SHALL come from the tool payload.
 - A-13. If the user asks for non-lodging help (flights, tours), the assistant SHALL refuse that scope and offer lodging help instead.
@@ -68,8 +68,9 @@ Stay-search logic that turns a request into five lodging options with OTA links.
 - R-02. Search SHALL NOT recommend flights, tours, attractions, restaurants, or other non-lodging services.
 - R-03. Search SHALL accept **any city name** as destination. Unknown or uncovered cities SHALL still return five sample options for that city, with sample OTA links if needed, rather than refusing the city.
 - R-04. **Required input:** destination (city or equivalent place name). Without a destination the tool SHALL NOT be considered successfully completed; the assistant must ask for destination instead.
-- R-05. **Optional input, used when present:** dates, budget, guest count, stay type (from R-01), amenities, and other free-text preferences (for example “near the beach”, “quiet”, “family”).
-- R-06. Optional fields SHALL NOT be required to produce results. Missing dates, budget, or guests is a valid search.
+- R-05. **Optional input, used when present:** dates, budget, **number of people** (total guest count), stay type (from R-01), amenities, and other free-text preferences (for example “near the beach”, “quiet”, “family”).
+- R-05a. When number of people is present, the 5 options SHALL prefer stays that can sleep that party, as far as the data allows. Mention party size in `why` when it affected the match.
+- R-06. Optional fields SHALL NOT be required to produce results. Missing dates, budget, or number of people is a valid search.
 - R-07. A successful search SHALL return **exactly 5** lodging options for a typical recommendation turn.
 - R-08. Each option SHALL include: name; stay type (one of R-01); location/area (at least city; neighborhood or area when known); price or price range; rating; short why; OTA listing URL (Booking.com, Airbnb, or similar; **real or sample**).
 - R-09. Links SHALL be OTA listing links, not only a generic web search or a map query. Sample/fake OTA URLs are allowed.
@@ -93,6 +94,7 @@ Stay-search logic that turns a request into five lodging options with OTA links.
 - Photos, maps, availability, or real-time prices.
 - Ranking beyond “fits the request”.
 - Returning more or fewer than 5 because the user asked “just one” / “show more”.
+- Special stay requests: room type (double, twin, king, suite, family room, dorm bed, and similar) and occupancy split (how many people in each room, for example 2+2 or a double plus a single). Adults vs children, if collected, is part of this enhancement, not v1 must-have.
 
 ## Not a requirement
 
@@ -112,6 +114,7 @@ Stay-search logic that turns a request into five lodging options with OTA links.
 - “Find me a hotel in Rome” → 5 lodging options with links, no extra required questions.
 - “I need a place to stay” → one question: where? After “Rome” → 5 options.
 - “Rome, 12–15 March, under $150, hostel” → 5 options using those filters.
+- “Rome for 4 people” → 5 options that prefer capacity for 4; `why` can mention the party size. Missing a people count still returns 5 options.
 - “Show cheaper ones” after a Rome search → new 5 options still for Rome.
 - Given a city with no curated data, the user still gets 5 sample lodging options for that city, not an error.
 - LLM or tool outage → English error that says what failed and to retry, not a fake list.

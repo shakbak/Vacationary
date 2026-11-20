@@ -19,7 +19,7 @@ Product behavior matches the assistant and recommendation rules in [backend.md](
 - WEB-06. The user SHALL be able to type an English message and send it to the assistant.
 - WEB-07. The client SHALL show the conversation history for this session: prior user messages and assistant replies, in order, on the same screen as the composer.
 - WEB-08. After a successful turn, the new user message and the assistant reply SHALL appear in that history without a full page reload.
-- WEB-09. Follow-up messages (for example “cheaper” or “near the beach”) SHALL be sent as ordinary chat messages on the same conversation so the backend can apply existing trip context.
+- WEB-09. Follow-up messages (for example “cheaper”, “near the beach”, or “we’re 4 people”) SHALL be sent as ordinary chat messages on the same conversation so prior turns (destination, people count, and other filters) are still in the history. Number of people is not a separate form field in v1.
 - WEB-10. No login, signup, or password screen. An anonymous session is enough.
 
 ### Loading, success, and error
@@ -53,6 +53,7 @@ Product behavior matches the assistant and recommendation rules in [backend.md](
 - Starting on WhatsApp and continuing on the web (account/session linking).
 - Handling a second typed message while a reply is still loading (v1 forbids send during load instead).
 - A dedicated “new conversation” button (the user can already say “start over” in chat).
+- UI for room type or occupancy split (v1: user can type it; backend treats it as nice-to-have).
 
 ## Not a requirement
 

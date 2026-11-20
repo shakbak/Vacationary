@@ -44,7 +44,9 @@ Every user turn ends in exactly one of these:
 ## Conversation rules
 
 - Required to recommend: destination only.
-- Optional, used when present: dates, budget, guests, stay type, amenities, free-text preferences.
+- Optional, used when present: dates, budget, **number of people** (total guest count), stay type, amenities, free-text preferences.
+- Number of people, when given, is passed into search so options can sleep that party. The assistant does not ask for it as a blocking question.
+- Nice to have (not committed): room type and occupancy split (people per room).
 - If the first message is complete (“hostel in Rome under $150”) → **Recommend** in that turn. No questionnaire.
 - If the first message has no destination → **Clarify** once; after the user replies with a city → **Recommend**.
 - Follow-up (“cheaper”, “near the beach”) keeps the same destination and prior filters unless the user names a new city or says to start over.
