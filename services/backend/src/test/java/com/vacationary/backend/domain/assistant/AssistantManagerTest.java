@@ -27,7 +27,8 @@ import com.vacationary.backend.dtos.recommendation.StayType;
 import com.vacationary.backend.errors.bl.BlAssistantException;
 import com.vacationary.backend.infra.llm.FakeLlmClient;
 import com.vacationary.backend.infra.recommendation.SampleStayProvider;
-import com.vacationary.backend.persistence.inmemory.recommendation.InMemoryStayRepository;
+import com.vacationary.backend.persistence.jdbc.H2TestDataSource;
+import com.vacationary.backend.persistence.jdbc.recommendation.JdbcStayRepository;
 
 class AssistantManagerTest {
 
@@ -159,7 +160,7 @@ class AssistantManagerTest {
 	@Test
 	void realStayManagerReturnsFiveForRome() {
 		StayManager stays = new StayManager(
-				InMemoryStayRepository.withFixtures(),
+				new JdbcStayRepository(H2TestDataSource.create()),
 				new SampleStayProvider(),
 				new StayListingMapper());
 		FakeLlmClient llm = new FakeLlmClient(

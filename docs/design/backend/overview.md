@@ -16,14 +16,15 @@ Every domain uses the same kinds of parts. Spring `@Configuration` binds each in
 | **Manager** | Orchestrates one domain’s rules; depends only on interfaces | SQL, HTTP, WhatsApp, an LLM SDK |
 | **Repository** | Load/save domain data | Business rules |
 | **Mapper** | `Db*` ↔ `Bl*`, or `Api*` ↔ `Bl*` | Rules |
-| **In-memory stub** | Repository (or provider) that holds maps in process | Production DB (not required) |
+| **In-memory stub** | Repository (or provider) that holds maps/lists in process | Production DB (not required) |
+| **JDBC store** | Repository backed by in-process H2 | Durable/shared SQL |
 | **Infra provider** | Talks to the outside world (LLM HTTP) behind an interface | Domain rules |
 | **Command executor** | One use-case: `Bl` in, result out; calls managers | Parsing HTTP |
 | **Request mapper / schema / response handler / error handler** | HTTP pipeline only | Domain |
 | **Route handler** | Runs: validate → map to Bl → execute → map to Api | Business logic |
 | **Factory** | Wires the pipeline for one feature | Logic |
 
-Not in this service (not in requirements): login, JWT, rate limits, audit logging, Redis, SQL.
+Not in this service (not in requirements): login, JWT, rate limits, audit logging, Redis, durable/shared SQL. Conversation, processed events, and stay listings are in-process H2.
 
 **Errors:** domain throws / returns **BL errors**. HTTP error handler maps those to JSON. Inner domains do not set HTTP status codes.
 
@@ -43,7 +44,7 @@ com.vacationary.backend
     assistant/
     conversation/
   persistence/
-    inmemory/         stub stores + Db mappers
+    jdbc/             BaseJdbcStore + H2 conversation, processed-event, stay-listing stores
   infra/
     llm/              ILlmClient HTTP adapter
     recommendation/   any-city provider
@@ -58,19 +59,22 @@ com.vacationary.backend
 ## Domain graph
 
 ```
-http.features.*  --CommandExecutor-->  ConversationManager
-                                          │
-                                          ├── ConversationRepository
-                                          ├── ProcessedEventRepository
-                                          └── IAssistantManager (AssistantManager)
-                                                 │
-                                                 ├── ILlmManager (LlmManager)
-                                                 │      ├── ILlmPromptBuilder
-                                                 │      └── ILlmClient
-                                                 └── IStayManager (StayManager)
-                                                        │
-                                                        ├── IStayRepository
-                                                        └── IStayProvider
+http.features.turns    --CommandExecutor-->  IProcessedEventManager (find/save)
+                                        \-->  IConversationManager.handleTurn
+http.features.history  --CommandExecutor-->  IConversationManager.getConversation
+                                                    │
+                                                    ├── IConversationRepository
+                                                    └── IAssistantManager (AssistantManager)
+                                                           │
+                                                           ├── ILlmManager (LlmManager)
+                                                           │      ├── ILlmPromptBuilder
+                                                           │      └── ILlmClient
+                                                           └── IStayManager (StayManager)
+                                                                  │
+                                                                  ├── IStayRepository
+                                                                  └── IStayProvider
+IProcessedEventManager
+  └── IProcessedEventRepository
 ```
 
 Follow-ups work because the **message list** for that conversation is passed into the assistant. There is no separate stored destination or filter snapshot.

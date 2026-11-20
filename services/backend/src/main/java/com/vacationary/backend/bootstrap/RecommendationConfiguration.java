@@ -1,5 +1,8 @@
 package com.vacationary.backend.bootstrap;
 
+import javax.sql.DataSource;
+
+import org.springframework.boot.sql.init.dependency.DependsOnDatabaseInitialization;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -9,14 +12,15 @@ import com.vacationary.backend.core.interfaces.recommendation.IStayRepository;
 import com.vacationary.backend.domain.recommendation.StayListingMapper;
 import com.vacationary.backend.domain.recommendation.StayManager;
 import com.vacationary.backend.infra.recommendation.SampleStayProvider;
-import com.vacationary.backend.persistence.inmemory.recommendation.InMemoryStayRepository;
+import com.vacationary.backend.persistence.jdbc.recommendation.JdbcStayRepository;
 
 @Configuration
 public class RecommendationConfiguration {
 
 	@Bean
-	IStayRepository stayRepository() {
-		return InMemoryStayRepository.withFixtures();
+	@DependsOnDatabaseInitialization
+	IStayRepository stayRepository(DataSource dataSource) {
+		return new JdbcStayRepository(dataSource);
 	}
 
 	@Bean

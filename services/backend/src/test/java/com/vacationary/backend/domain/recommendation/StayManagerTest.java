@@ -21,12 +21,13 @@ import com.vacationary.backend.dtos.recommendation.StaySearchResult;
 import com.vacationary.backend.dtos.recommendation.StayType;
 import com.vacationary.backend.errors.bl.BlValidationError;
 import com.vacationary.backend.infra.recommendation.SampleStayProvider;
-import com.vacationary.backend.persistence.inmemory.recommendation.InMemoryStayRepository;
+import com.vacationary.backend.persistence.jdbc.H2TestDataSource;
+import com.vacationary.backend.persistence.jdbc.recommendation.JdbcStayRepository;
 
 class StayManagerTest {
 
 	private final StayManager manager = new StayManager(
-			InMemoryStayRepository.withFixtures(),
+			new JdbcStayRepository(H2TestDataSource.create()),
 			new SampleStayProvider(),
 			new StayListingMapper());
 

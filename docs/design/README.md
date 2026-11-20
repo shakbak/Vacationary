@@ -2,7 +2,7 @@
 
 Developer design: **how each backend domain is built** (inner parts and the flow between them). Requirements stay in [docs/requirements](../requirements/README.md).
 
-Manager, repository, mapper, in-memory stub, HTTP pipeline. Spring wiring. No security/rate-limit extras.
+Manager, repository, mapper, in-memory stub / H2 JDBC, HTTP pipeline. Spring wiring. No security/rate-limit extras.
 
 Build order: recommendation → assistant → conversation → HTTP.
 

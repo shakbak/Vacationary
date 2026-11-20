@@ -1,6 +1,6 @@
 # Recommendation domain — inner design
 
-Stay search. No HTTP, no LLM, no conversations. **Manager + repository + mapper + in-memory data**, plus a provider so “any city” works.
+Stay search. No HTTP, no LLM, no conversations. **Manager + repository + mapper + H2 listings**, plus a provider so “any city” works.
 
 Implement this first.
 
@@ -20,7 +20,7 @@ recommendation
 | `IStayManager` | Port the assistant calls: `search(query)` |
 | `StayManager` | Destination required, apply filters, always 5 options; unknown city is not failure |
 | `IStayRepository` | `findByDestination(city) → rows` |
-| `InMemoryStayRepository` | Fixture list in a `Map` / list; v1 persistence |
+| `JdbcStayRepository` | H2 `stay_listings`; seeds fixture rows if empty |
 | `DbStayListing` | Persistence shape (capacity, raw price, city key, …) |
 | `StayListingMapper` | `DbStayListing` → `BlStayOption` (fills `why` using the query) |
 | `IStayProvider` | `generate(query) → 5 BlStayOption` when repository is thin or city unknown |
@@ -66,7 +66,7 @@ The manager is **stateless** besides its two collaborators. A follow-up search i
 
 ```
 IStayManager ← StayManager(IStayRepository, IStayProvider, StayListingMapper)
-IStayRepository ← InMemoryStayRepository(fixture rows)
+IStayRepository ← JdbcStayRepository(DataSource)  // seeds CatalogFixtures if empty
 IStayProvider ← SampleStayProvider
 ```
 
@@ -74,7 +74,7 @@ Tests can bind a fake `IStayManager` (assistant tests) or a fake `IStayRepositor
 
 ## Swap
 
-- Replace `InMemoryStayRepository` with another `IStayRepository` without touching the manager.
+- Replace `JdbcStayRepository` with another `IStayRepository` without touching the manager.
 - Replace `IStayManager` entirely (live OTA) without touching the assistant.
 
 ## Out of this domain

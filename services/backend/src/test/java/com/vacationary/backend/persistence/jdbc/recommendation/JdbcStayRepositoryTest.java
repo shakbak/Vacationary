@@ -1,4 +1,4 @@
-package com.vacationary.backend.persistence.inmemory.recommendation;
+package com.vacationary.backend.persistence.jdbc.recommendation;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -8,10 +8,11 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 import com.vacationary.backend.dtos.recommendation.DbStayListing;
+import com.vacationary.backend.persistence.jdbc.H2TestDataSource;
 
-class InMemoryStayRepositoryTest {
+class JdbcStayRepositoryTest {
 
-	private final InMemoryStayRepository repository = InMemoryStayRepository.withFixtures();
+	private final JdbcStayRepository repository = new JdbcStayRepository(H2TestDataSource.create());
 
 	@Test
 	void findsFixtureCity() {
@@ -26,8 +27,14 @@ class InMemoryStayRepositoryTest {
 	}
 
 	@Test
+	void blankDestinationIsEmpty() {
+		assertTrue(repository.findByDestination(null).isEmpty());
+		assertTrue(repository.findByDestination("  ").isEmpty());
+	}
+
+	@Test
 	void normalizeCollapsesCaseAndSpaces() {
 		assertEquals(repository.findByDestination("Rome").size(), repository.findByDestination("  rome ").size());
-		assertEquals("new york", InMemoryStayRepository.normalize(" New   York "));
+		assertEquals("new york", JdbcStayRepository.normalize(" New   York "));
 	}
 }

@@ -1,4 +1,4 @@
-package com.vacationary.backend.persistence.inmemory.recommendation;
+package com.vacationary.backend.persistence.jdbc.recommendation;
 
 import java.util.List;
 import java.util.Locale;

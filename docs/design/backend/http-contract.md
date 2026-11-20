@@ -2,7 +2,7 @@
 
 Pipeline: **validate → map API→BL → execute → map BL→API**, plus an error handler. Two features (`turns`, `history`). No rate limiter, no auth, no audit logger.
 
-Depends on **`ConversationManager` only**. Implement last.
+Depends on **`IProcessedEventManager` and `IConversationManager` (turns)** and **`IConversationManager` (history)**. Implement last. Does not call the assistant or stay search. The turns executor orchestrates duplicate short-circuit vs a new conversation turn.
 
 ## Inner parts
 
@@ -11,7 +11,8 @@ Spring controller / router
   └── RouteHandler.handle(req, res)
         1. SchemaValidator.validate
         2. RequestMapper.mapApiToBl
-        3. CommandExecutor.execute        → ConversationManager
+        3. CommandExecutor.execute        → processed-event find, else conversation turn, else save event
+                                          → or getConversation
         4. ResponseHandler.handle         Bl → Api JSON
         catch → ErrorHandler.handle
 ```
@@ -21,10 +22,10 @@ Spring controller / router
 | `RouteHandler` | Shared pipeline; no lodging logic |
 | `TurnsSchemaValidator` | Required JSON fields for POST `/turns` |
 | `TurnsRequestMapper` | `ApiTurnRequest` → `BlTurnCommand` |
-| `TurnsCommandExecutor` | `conversationManager.handleTurn(bl)` |
+| `TurnsCommandExecutor` | find processed event → duplicate `BlTurnResult`; else `conversationManager.handleTurn` then save event |
 | `TurnsResponseHandler` | `BlTurnResult` → `ApiTurnResponse` (status 200) |
 | `HistoryRequestMapper` | path params → `BlConversationKey` |
-| `HistoryCommandExecutor` | `getConversation` |
+| `HistoryCommandExecutor` | `conversationManager.getConversation` |
 | `HistoryResponseHandler` | `BlConversation` → `ApiConversationResponse` |
 | `HttpErrorHandler` | BL / validation → JSON; LLM/tool `fail` is a **200 body**, not a thrown error |
 | Feature factories | Construct the five pieces per route |
@@ -60,7 +61,13 @@ RouteHandler
   TurnsRequestMapper: ApiTurnRequest → BlTurnCommand
        (channel lowercased; no WhatsApp fields)
   TurnsCommandExecutor.execute(bl):
-       return ConversationManager.handleTurn(bl)
+       eventKey = BlEventKey(bl.conversation.channel, bl.eventId)
+       existing = IProcessedEventManager.find(eventKey)
+       if present → BlTurnResult(outcome, duplicate=true)
+       else:
+         response = IConversationManager.handleTurn(bl.conversation, bl.text)
+         IProcessedEventManager.save(BlProcessedEvent(eventKey, response))
+         BlTurnResult(response, duplicate=false)
   TurnsResponseHandler:
        HTTP 200
        ApiTurnResponse from BlTurnResult
@@ -78,7 +85,7 @@ GET `/conversations/...` is the same pipeline with history mapper/executor/handl
 TurnsRouteHandler ← RouteHandler(
   TurnsSchemaValidator,
   TurnsRequestMapper,
-  TurnsCommandExecutor(ConversationManager),
+  TurnsCommandExecutor(IProcessedEventManager, IConversationManager),
   TurnsResponseHandler,
   HttpErrorHandler)
 ```
