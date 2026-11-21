@@ -4,25 +4,24 @@ Isolation, history, idempotency receipts. **Managers + repositories + Db mappers
 
 Implement after assistant.
 
-The conversation store keeps **messages**, not a destination or filter snapshot. Follow-up context is those messages. Processed events are a separate delivery receipt. The two managers do **not** wrap each other. **Turns HTTP** (`CommandExecutor`) orchestrates: find event → maybe return duplicate → else run the conversation → save the event.
+The conversation store keeps **messages**, not a destination or filter snapshot. Follow-up context is those messages. Processed events are a separate delivery receipt. Conversation does **not** call the assistant. **Turns HTTP** (`CommandExecutor`) orchestrates: getEvent → maybe return duplicate → else load history, call assistant, save turn, save event.
 
 ## Inner parts
 
 ```
-IProcessedEventManager           find/save (BlEventKey) → stored outcome
+IProcessedEventManager           getEvent/save (BlEventKey) → stored outcome
   ├── IProcessedEventRepository
   └── ProcessedEventMapper       DbProcessedEvent ↔ BlProcessedEvent
 
-IConversationManager             handleTurn(key, text); getConversation(key)
+IConversationManager             getConversation(key); saveTurn(key, text, response)
   ├── IConversationRepository
-  │     └── ConversationMapper   DbConversation ↔ BlConversation
-  └── IAssistantManager
+  └── ConversationMapper         DbConversation ↔ BlConversation
 ```
 
 | Part | Responsibility |
 |---|---|
-| `IProcessedEventManager` | `find` / `save` a `BlProcessedEvent`. No chat, no assistant, no `duplicate` flag. |
-| `IConversationManager` | `handleTurn(key, text)` chat only; `getConversation(key)`. No `eventId`. |
+| `IProcessedEventManager` | `getEvent` / `save` a `BlProcessedEvent`. No chat, no assistant, no `duplicate` flag. |
+| `IConversationManager` | `getConversation(key)`; `saveTurn(key, text, response)` persists user + assistant together. No `eventId`, no assistant call. |
 | `IConversationRepository` | `find(key)`, `save(conversation)` |
 | `IProcessedEventRepository` | `find(BlEventKey)`, `save(...)` |
 | `JdbcConversationStore` | H2 tables: `conversations`, `messages`, `message_stay_options` |
@@ -37,7 +36,7 @@ IConversationManager             handleTurn(key, text); getConversation(key)
 | `BlConversationKey` | `channel` + `externalUserId` |
 | `BlEventKey` | `channel` + `eventId` |
 
-HTTP does not call `IAssistantManager` or repositories. Managers do not call each other.
+HTTP does not call repositories. Managers do not call each other. The turns executor calls `IAssistantManager`.
 
 ## Types
 
@@ -66,31 +65,27 @@ Turns HTTP (`TurnsCommandExecutor`), not a domain wrapper:
 ```
 TurnsCommandExecutor.execute(BlTurnCommand)
   eventKey = BlEventKey(command.conversation.channel, command.eventId)
-  existing = IProcessedEventManager.find(eventKey)
+  existing = IProcessedEventManager.getEvent(eventKey)
   if present → BlTurnResult(existing.outcome, duplicate=true)
   else:
-    response = IConversationManager.handleTurn(command.conversation, command.text)
+    history = IConversationManager.getConversation(command.conversation)
+    response = IAssistantManager.respond({ messages: history + this user, latestUserText })
+    if IAssistantManager throws: response = fail process (retry)
+    IConversationManager.saveTurn(command.conversation, command.text, response)
     IProcessedEventManager.save(BlProcessedEvent(eventKey, response))
     BlTurnResult(response, duplicate=false)
 ```
 
 ```
-IConversationManager.handleTurn(key, text)
-  1. validate key + text
-  2. row = IConversationRepository.find(key)
-     conv = row mapped to BlConversation, or new empty BlConversation(key)
-  3. append user BlMessage(text)
-  4. response = IAssistantManager.respond({
-       messages: conv.messages,          // this key only, including prior turns
-       latestUserText: text
-     })
-     if IAssistantManager throws: response = fail process (retry)
-  5. append assistant BlMessage from response
-  6. IConversationRepository.save(mapper.toDb(conv))
-  7. return response
-
 IConversationManager.getConversation(key)
   find → map to Bl, or empty conversation (not an error)
+
+IConversationManager.saveTurn(key, text, response)
+  1. validate key + text + response
+  2. load conversation (or empty)
+  3. append user BlMessage(text)
+  4. append assistant BlMessage from response (kind, text, recommendations)
+  5. save
 ```
 
 Isolation: conversation repository keys by `BlConversationKey`. The manager never loads a second key in one turn. Follow-up is the same key, so “cheaper” still has “hotels in Lisbon” in `messages`.
@@ -103,21 +98,20 @@ H2 is an in-process SQL database (`jdbc:h2:mem:vacationary;MODE=PostgreSQL`). It
 
 ```
 IProcessedEventManager ← ProcessedEventManager(IProcessedEventRepository, ProcessedEventMapper)
-IConversationManager ← ConversationManager(IConversationRepository, ConversationMapper, IAssistantManager)
+IConversationManager ← ConversationManager(IConversationRepository, ConversationMapper)
 IConversationRepository ← JdbcConversationStore(DataSource)
 IProcessedEventRepository ← JdbcProcessedEventStore(DataSource)
 ```
 
-Conversation tests bind a **fake IAssistantManager**. Duplicate-event coverage belongs on the turns executor when HTTP exists.
+Conversation tests do not bind an assistant. Duplicate-event, follow-up prompt, and assistant-throw coverage belong on the turns executor.
 
 ## Swap
 
 - New `IConversationRepository` (durable SQL) without changing the manager.
-- Fake `IAssistantManager` for this domain’s tests.
 
 ## Out of this domain
 
-- Stay search, LLM SDKs
+- Stay search, LLM SDKs, `IAssistantManager`
 - `Api*` JSON, HTTP status
 - A destination/filter snapshot beside the messages
 - Account linking, security

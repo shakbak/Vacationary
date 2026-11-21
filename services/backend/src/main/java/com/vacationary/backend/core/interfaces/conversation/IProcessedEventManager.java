@@ -7,7 +7,7 @@ import com.vacationary.backend.dtos.conversation.BlProcessedEvent;
 
 public interface IProcessedEventManager {
 
-	Optional<BlProcessedEvent> find(BlEventKey key);
+	Optional<BlProcessedEvent> getEvent(BlEventKey key);
 
 	void save(BlProcessedEvent event);
 }

@@ -6,7 +6,7 @@ import com.vacationary.backend.dtos.conversation.BlConversationKey;
 
 public interface IConversationManager {
 
-	BlAssistantResponse handleTurn(BlConversationKey key, String text);
-
 	BlConversation getConversation(BlConversationKey key);
+
+	void saveTurn(BlConversationKey key, String text, BlAssistantResponse response);
 }

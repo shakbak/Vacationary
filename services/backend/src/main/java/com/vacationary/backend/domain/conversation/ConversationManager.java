@@ -1,15 +1,11 @@
 package com.vacationary.backend.domain.conversation;
 
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
 
-import com.vacationary.backend.core.interfaces.assistant.IAssistantManager;
 import com.vacationary.backend.core.interfaces.conversation.IConversationManager;
 import com.vacationary.backend.core.interfaces.conversation.IConversationRepository;
-import com.vacationary.backend.dtos.assistant.BlAssistantRequest;
 import com.vacationary.backend.dtos.assistant.BlAssistantResponse;
-import com.vacationary.backend.dtos.assistant.BlChatMessage;
 import com.vacationary.backend.dtos.assistant.ChatRole;
 import com.vacationary.backend.dtos.conversation.BlConversation;
 import com.vacationary.backend.dtos.conversation.BlConversationKey;
@@ -18,66 +14,48 @@ import com.vacationary.backend.errors.bl.BlValidationError;
 
 public class ConversationManager implements IConversationManager {
 
-	static final String ASSISTANT_FAIL = "I could not process that message. Please retry.";
-
 	private final IConversationRepository conversationRepository;
 	private final ConversationMapper conversationMapper;
-	private final IAssistantManager assistantManager;
 
 	public ConversationManager(
 			IConversationRepository conversationRepository,
-			ConversationMapper conversationMapper,
-			IAssistantManager assistantManager) {
+			ConversationMapper conversationMapper) {
 		this.conversationRepository = conversationRepository;
 		this.conversationMapper = conversationMapper;
-		this.assistantManager = assistantManager;
 	}
 
 	@Override
-	public BlAssistantResponse handleTurn(BlConversationKey key, String text) {
+	public BlConversation getConversation(BlConversationKey key) {
+		BlConversationKey normalized = ConversationValidator.validateKey(key);
+		return load(normalized);
+	}
+
+	@Override
+	public void saveTurn(BlConversationKey key, String text, BlAssistantResponse response) {
 		BlConversationKey normalizedKey = ConversationValidator.validateKey(key);
 		String normalizedText = ConversationValidator.validateText(text);
-		BlConversation conversation = conversationRepository.find(normalizedKey)
-				.map(conversationMapper::toBl)
-				.orElseGet(() -> BlConversation.empty(normalizedKey));
+		ConversationValidator.validateResponse(response);
+		BlConversation conversation = load(normalizedKey);
 		BlMessage userMessage = new BlMessage(
 				ChatRole.USER,
 				normalizedText,
 				Instant.now(),
 				null,
 				List.of());
-		conversation = conversation.withMessage(userMessage);
-		BlAssistantResponse response = respond(conversation, normalizedText);
 		BlMessage assistantMessage = new BlMessage(
 				ChatRole.ASSISTANT,
 				response.text(),
 				Instant.now(),
 				response.kind(),
 				response.recommendations());
-		conversation = conversation.withMessage(assistantMessage);
+		conversation = conversation.withMessage(userMessage).withMessage(assistantMessage);
 		conversationRepository.save(conversationMapper.toDb(conversation));
-		return response;
 	}
 
-	@Override
-	public BlConversation getConversation(BlConversationKey key) {
-		BlConversationKey normalized = ConversationValidator.validateKey(key);
-		return conversationRepository.find(normalized)
+	private BlConversation load(BlConversationKey key) {
+		return conversationRepository.find(key)
 				.map(conversationMapper::toBl)
-				.orElseGet(() -> BlConversation.empty(normalized));
-	}
-
-	private BlAssistantResponse respond(BlConversation conversation, String latestUserText) {
-		try {
-			List<BlChatMessage> messages = new ArrayList<>();
-			for (BlMessage message : conversation.messages()) {
-				messages.add(new BlChatMessage(message.role(), message.text()));
-			}
-			return assistantManager.respond(new BlAssistantRequest(messages, latestUserText));
-		}
-		catch (RuntimeException ignored) {
-			return BlAssistantResponse.fail(ASSISTANT_FAIL);
-		}
+				.orElseGet(() -> BlConversation.empty(key));
 	}
 
 	private static final class ConversationValidator {
@@ -105,6 +83,15 @@ public class ConversationManager implements IConversationManager {
 				throw new BlValidationError("text is required");
 			}
 			return normalized;
+		}
+
+		static void validateResponse(BlAssistantResponse response) {
+			if (response == null || response.kind() == null) {
+				throw new BlValidationError("assistant response is required");
+			}
+			if (trimToNull(response.text()) == null) {
+				throw new BlValidationError("assistant response text is required");
+			}
 		}
 
 		private static String trimToNull(String value) {

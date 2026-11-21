@@ -5,7 +5,6 @@ import javax.sql.DataSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.vacationary.backend.core.interfaces.assistant.IAssistantManager;
 import com.vacationary.backend.core.interfaces.conversation.IConversationManager;
 import com.vacationary.backend.core.interfaces.conversation.IConversationRepository;
 import com.vacationary.backend.core.interfaces.conversation.IProcessedEventManager;
@@ -43,12 +42,8 @@ public class ConversationConfiguration {
 	@Bean
 	IConversationManager conversationManager(
 			IConversationRepository conversationRepository,
-			ConversationMapper conversationMapper,
-			IAssistantManager assistantManager) {
-		return new ConversationManager(
-				conversationRepository,
-				conversationMapper,
-				assistantManager);
+			ConversationMapper conversationMapper) {
+		return new ConversationManager(conversationRepository, conversationMapper);
 	}
 
 	@Bean

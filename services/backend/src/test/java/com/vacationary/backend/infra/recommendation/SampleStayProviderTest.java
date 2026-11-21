@@ -3,6 +3,7 @@ package com.vacationary.backend.infra.recommendation;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -38,6 +39,21 @@ class SampleStayProviderTest {
 	void sameCityIsDeterministic() {
 		BlStaySearchQuery query = BlStaySearchQuery.ofDestination("Kyoto");
 		assertEquals(names(provider.generate(query)), names(provider.generate(query)));
+	}
+
+	@Test
+	void usableDatesAppearOnGeneratedOptions() {
+		List<BlStayOption> options = provider.generate(new BlStaySearchQuery(
+				"Kyoto",
+				LocalDate.of(2026, 6, 1),
+				LocalDate.of(2026, 6, 5),
+				150,
+				null,
+				null,
+				null));
+		assertTrue(options.stream().allMatch(option -> option.why().contains("4 nights, 1–5 Jun")));
+		assertTrue(options.stream().allMatch(option -> option.why().contains("for the stay")));
+		assertTrue(options.stream().allMatch(option -> option.price().contains("· 4 nights")));
 	}
 
 	private static Set<String> names(List<BlStayOption> options) {

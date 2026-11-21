@@ -15,14 +15,10 @@ public class StayListingMapper {
 				listing.name(),
 				listing.stayType(),
 				listing.area() + ", " + listing.cityName(),
-				formatPrice(listing.pricePerNight()),
+				StayDates.formatPrice(listing.pricePerNight(), query),
 				formatRating(listing.rating()),
 				buildWhy(listing, query, fullMatch),
 				listing.url());
-	}
-
-	private static String formatPrice(int pricePerNight) {
-		return "$" + pricePerNight + " / night";
 	}
 
 	private static String formatRating(double rating) {
@@ -32,12 +28,14 @@ public class StayListingMapper {
 	private static String buildWhy(DbStayListing listing, BlStaySearchQuery query, boolean fullMatch) {
 		List<String> parts = new ArrayList<>();
 		parts.add(typeLabel(listing) + " in " + listing.area() + ", " + listing.cityName());
+		addIfPresent(parts, StayDates.staySummary(query));
 		if (query.guestCount() != null) {
 			parts.add("Sleeps " + listing.sleeps());
 		}
 		if (query.budgetMax() != null) {
 			parts.add("$" + listing.pricePerNight() + " per night");
 		}
+		addIfPresent(parts, StayDates.tripTotal(query, listing.pricePerNight()));
 		if (query.stayType() != null && listing.stayType() == query.stayType()) {
 			parts.add("Requested stay type");
 		}
@@ -45,6 +43,12 @@ public class StayListingMapper {
 			parts.add("Not a full match for this request");
 		}
 		return String.join(". ", parts) + ".";
+	}
+
+	private static void addIfPresent(List<String> parts, String part) {
+		if (part != null) {
+			parts.add(part);
+		}
 	}
 
 	private static String typeLabel(DbStayListing listing) {

@@ -93,7 +93,7 @@ class StayManagerTest {
 	}
 
 	@Test
-	void datesAreAcceptedAndIgnoredForRanking() {
+	void datesDoNotChangeRankingButAppearOnOptions() {
 		StaySearchResult.Success withDates = searchRome(new BlStaySearchQuery(
 				"Rome",
 				LocalDate.of(2026, 6, 1),
@@ -104,6 +104,23 @@ class StayManagerTest {
 				null));
 		StaySearchResult.Success withoutDates = searchRome(BlStaySearchQuery.ofDestination("Rome"));
 		assertEquals(names(withoutDates), names(withDates));
+		assertTrue(withDates.options().stream().allMatch(option -> option.why().contains("4 nights, 1–5 Jun")));
+		assertTrue(withDates.options().stream().allMatch(option -> option.price().contains("· 4 nights")));
+		assertTrue(withoutDates.options().stream().noneMatch(option -> option.why().contains("nights")));
+	}
+
+	@Test
+	void invertedDatesAreIgnoredLikeMissingDates() {
+		StaySearchResult.Success inverted = searchRome(new BlStaySearchQuery(
+				"Rome",
+				LocalDate.of(2026, 6, 5),
+				LocalDate.of(2026, 6, 1),
+				null,
+				null,
+				null,
+				null));
+		assertTrue(inverted.options().stream().noneMatch(option -> option.why().contains("nights")));
+		assertTrue(inverted.options().stream().noneMatch(option -> option.price().contains("·")));
 	}
 
 	@Test

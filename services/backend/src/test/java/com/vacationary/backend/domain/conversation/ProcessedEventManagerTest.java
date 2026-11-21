@@ -28,14 +28,14 @@ class ProcessedEventManagerTest {
 
 	@Test
 	void missingEventIsEmpty() {
-		assertTrue(manager.find(eventKey(ConversationChannel.WEB, "missing")).isEmpty());
+		assertTrue(manager.getEvent(eventKey(ConversationChannel.WEB, "missing")).isEmpty());
 	}
 
 	@Test
-	void invalidFindOrSaveThrows() {
-		assertThrows(BlValidationError.class, () -> manager.find(null));
-		assertThrows(BlValidationError.class, () -> manager.find(eventKey(null, "e1")));
-		assertThrows(BlValidationError.class, () -> manager.find(eventKey(ConversationChannel.WEB, "  ")));
+	void invalidGetEventOrSaveThrows() {
+		assertThrows(BlValidationError.class, () -> manager.getEvent(null));
+		assertThrows(BlValidationError.class, () -> manager.getEvent(eventKey(null, "e1")));
+		assertThrows(BlValidationError.class, () -> manager.getEvent(eventKey(ConversationChannel.WEB, "  ")));
 		assertThrows(BlValidationError.class, () -> manager.save(null));
 		assertThrows(BlValidationError.class, () -> manager.save(
 				new BlProcessedEvent(eventKey(ConversationChannel.WEB, "e1"), null)));
@@ -48,14 +48,14 @@ class ProcessedEventManagerTest {
 	}
 
 	@Test
-	void saveThenFindReturnsTheOutcomeNotATurnResult() {
+	void saveThenGetEventReturnsTheOutcomeNotATurnResult() {
 		BlAssistantResponse outcome = BlAssistantResponse.clarify("Where would you like to stay?");
 		manager.save(new BlProcessedEvent(eventKey(ConversationChannel.WHATSAPP, "evt-1"), outcome));
-		Optional<BlProcessedEvent> found = manager.find(eventKey(ConversationChannel.WHATSAPP, "evt-1"));
+		Optional<BlProcessedEvent> found = manager.getEvent(eventKey(ConversationChannel.WHATSAPP, "evt-1"));
 		assertTrue(found.isPresent());
 		assertEquals(AssistantResponseKind.CLARIFY, found.get().outcome().kind());
 		assertEquals("Where would you like to stay?", found.get().outcome().text());
-		assertTrue(manager.find(eventKey(ConversationChannel.WEB, "evt-1")).isEmpty());
+		assertTrue(manager.getEvent(eventKey(ConversationChannel.WEB, "evt-1")).isEmpty());
 	}
 
 	@Test
@@ -64,7 +64,7 @@ class ProcessedEventManagerTest {
 				"Alpha", StayType.HOTEL, "Rome", "$100 / night", "4.5", "why", "https://example.com/Alpha");
 		BlAssistantResponse outcome = BlAssistantResponse.recommend("Five places.", List.of(option));
 		manager.save(new BlProcessedEvent(eventKey(ConversationChannel.WEB, "rome-1"), outcome));
-		BlProcessedEvent found = manager.find(eventKey(ConversationChannel.WEB, "rome-1")).orElseThrow();
+		BlProcessedEvent found = manager.getEvent(eventKey(ConversationChannel.WEB, "rome-1")).orElseThrow();
 		assertEquals(1, found.outcome().recommendations().size());
 		assertEquals("Alpha", found.outcome().recommendations().getFirst().name());
 	}

@@ -31,9 +31,9 @@ AssistantManager                 implements IAssistantManager
 | `AssistantResponseMapper` | Copies **tool** `BlStayOption`s into `recommend`; never invents rows |
 | `BlAssistantRequest` / `BlAssistantResponse` | Conversation ↔ assistant |
 | `BlLlmRequest` / `BlLlmResponse` | `text` \| `toolRequest` \| `error` |
-| `BlAssistantException` | Unexpected; conversation maps this to `fail` |
+| `BlAssistantException` | Unexpected; the turns executor maps this to `fail` |
 
-Conversation never sees `ILlmManager` or `ILlmClient`. HTTP never sees `IStayManager`.
+Conversation never sees `IAssistantManager`, `ILlmManager`, or `ILlmClient`. HTTP never sees `IStayManager`. The turns executor calls `IAssistantManager`.
 
 ## Types
 

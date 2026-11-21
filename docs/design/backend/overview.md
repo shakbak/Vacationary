@@ -59,20 +59,19 @@ com.vacationary.backend
 ## Domain graph
 
 ```
-http.features.turns    --CommandExecutor-->  IProcessedEventManager (find/save)
-                                        \-->  IConversationManager.handleTurn
+http.features.turns    --CommandExecutor-->  IProcessedEventManager (getEvent/save)
+                                        \-->  IConversationManager.getConversation / saveTurn
+                                        \-->  IAssistantManager.respond
 http.features.history  --CommandExecutor-->  IConversationManager.getConversation
                                                     │
-                                                    ├── IConversationRepository
-                                                    └── IAssistantManager (AssistantManager)
-                                                           │
-                                                           ├── ILlmManager (LlmManager)
-                                                           │      ├── ILlmPromptBuilder
-                                                           │      └── ILlmClient
-                                                           └── IStayManager (StayManager)
-                                                                  │
-                                                                  ├── IStayRepository
-                                                                  └── IStayProvider
+                                                    └── IConversationRepository
+IAssistantManager (AssistantManager)
+  ├── ILlmManager (LlmManager)
+  │      ├── ILlmPromptBuilder
+  │      └── ILlmClient
+  └── IStayManager (StayManager)
+         ├── IStayRepository
+         └── IStayProvider
 IProcessedEventManager
   └── IProcessedEventRepository
 ```

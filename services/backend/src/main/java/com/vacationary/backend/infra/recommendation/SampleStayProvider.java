@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Locale;
 
 import com.vacationary.backend.core.interfaces.recommendation.IStayProvider;
+import com.vacationary.backend.domain.recommendation.StayDates;
 import com.vacationary.backend.dtos.recommendation.BlStayOption;
 import com.vacationary.backend.dtos.recommendation.BlStaySearchQuery;
 import com.vacationary.backend.dtos.recommendation.StayType;
@@ -40,7 +41,7 @@ public class SampleStayProvider implements IStayProvider {
 					name,
 					type,
 					area + ", " + city,
-					"$" + price + " / night",
+					StayDates.formatPrice(price, query),
 					String.format(Locale.US, "%.1f", 4.0 + ((seed + i) % 9) / 10.0),
 					why(type, area, city, query, sleeps, price),
 					"https://www.airbnb.com/rooms/sample-" + slug));
@@ -88,14 +89,22 @@ public class SampleStayProvider implements IStayProvider {
 			int sleeps,
 			int price) {
 		StringBuilder why = new StringBuilder(typeLabel(type) + " in " + area + ", " + city);
+		appendIfPresent(why, StayDates.staySummary(query));
 		if (query.guestCount() != null) {
 			why.append(". Sleeps ").append(sleeps);
 		}
 		if (query.budgetMax() != null) {
 			why.append(". $").append(price).append(" per night");
 		}
+		appendIfPresent(why, StayDates.tripTotal(query, price));
 		why.append(".");
 		return why.toString();
+	}
+
+	private static void appendIfPresent(StringBuilder why, String part) {
+		if (part != null) {
+			why.append(". ").append(part);
+		}
 	}
 
 	private static String typeLabel(StayType type) {

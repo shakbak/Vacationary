@@ -22,7 +22,7 @@ public class ProcessedEventManager implements IProcessedEventManager {
 	}
 
 	@Override
-	public Optional<BlProcessedEvent> find(BlEventKey key) {
+	public Optional<BlProcessedEvent> getEvent(BlEventKey key) {
 		BlEventKey normalized = EventValidator.validate(key);
 		return processedEventRepository.find(normalized).map(processedEventMapper::toBl);
 	}
