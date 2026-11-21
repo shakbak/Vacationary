@@ -36,7 +36,7 @@ Assistant and recommendation are **not** their own processes; they live in the b
 | [web.md](web.md) | Web client | React/TypeScript chat UI for the same assistant |
 | [system-behavior.md](system-behavior.md) | Whole system | Shared outcomes and turn flow across services |
 
-**Design** (how, not extra product scope): [backend](../design/backend/overview.md), [web](../design/web/overview.md).
+**Design** (how, not extra product scope): [backend](../design/backend/overview.md), [web](../design/web/overview.md), [messaging](../design/messaging/overview.md).
 
 ## How to read a file
 

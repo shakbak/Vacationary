@@ -28,4 +28,14 @@ Build order: api → session → chat → ui.
 | [web/chat.md](web/chat.md) | sessionStorage, API client, send/load, outcome vs HTTP error |
 | [web/ui.md](web/ui.md) | Transcript, stay cards, composer, loading/success/error, usability |
 
-Messaging design is not in this folder yet.
+## Messaging platforms
+
+Separate Spring process. WhatsApp Cloud API only in v1. Calls the backend; renders outcomes as English WhatsApp text.
+
+Build order: render → backend client → inbound processor → WhatsApp adapter → webhook.
+
+| File | Inner design of |
+|---|---|
+| [messaging/overview.md](messaging/overview.md) | Process boundary, layers, port 8081 |
+| [messaging/inbound.md](messaging/inbound.md) | Turn processor, backend client, renderer |
+| [messaging/whatsapp.md](messaging/whatsapp.md) | Webhook verify/parse, Graph send |
