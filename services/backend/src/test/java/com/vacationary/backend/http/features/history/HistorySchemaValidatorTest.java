@@ -24,8 +24,8 @@ class HistorySchemaValidatorTest {
 	@Test
 	void validPathPassesAndMaps() {
 		assertDoesNotThrow(() -> validator.validate(new ApiHistoryRequest("web", "alice")));
-		BlConversationKey key = mapper.mapApiToBl(new ApiHistoryRequest(" WHATSAPP ", " alice "));
-		assertEquals(ConversationChannel.WHATSAPP, key.channel());
+		BlConversationKey key = mapper.mapApiToBl(new ApiHistoryRequest(" TELEGRAM ", " alice "));
+		assertEquals(ConversationChannel.TELEGRAM, key.channel());
 		assertEquals("alice", key.externalUserId());
 	}
 

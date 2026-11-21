@@ -22,8 +22,8 @@ class TurnsRequestMapperTest {
 	}
 
 	@Test
-	void mapsWhatsapp() {
-		BlTurnCommand command = mapper.mapApiToBl(new ApiTurnRequest("whatsapp", "u1", "hi", "e1"));
-		assertEquals(ConversationChannel.WHATSAPP, command.conversation().channel());
+	void mapsTelegram() {
+		BlTurnCommand command = mapper.mapApiToBl(new ApiTurnRequest("telegram", "u1", "hi", "e1"));
+		assertEquals(ConversationChannel.TELEGRAM, command.conversation().channel());
 	}
 }

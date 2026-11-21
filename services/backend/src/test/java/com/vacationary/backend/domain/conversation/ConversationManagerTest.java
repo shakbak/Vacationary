@@ -87,15 +87,15 @@ class ConversationManagerTest {
 		manager.saveTurn(key(ConversationChannel.WEB, "alice"), "hello", BlAssistantResponse.clarify("Where, Alice?"));
 		manager.saveTurn(key(ConversationChannel.WEB, "bob"), "hi", BlAssistantResponse.clarify("Where, Bob?"));
 		manager.saveTurn(
-				key(ConversationChannel.WHATSAPP, "alice"),
+				key(ConversationChannel.TELEGRAM, "alice"),
 				"yo",
-				BlAssistantResponse.clarify("Where on WhatsApp?"));
+				BlAssistantResponse.clarify("Where on Telegram?"));
 
 		assertEquals("Where, Alice?", manager.getConversation(key(ConversationChannel.WEB, "alice")).messages().get(1).text());
 		assertEquals("Where, Bob?", manager.getConversation(key(ConversationChannel.WEB, "bob")).messages().get(1).text());
-		assertEquals("Where on WhatsApp?", manager.getConversation(
-				key(ConversationChannel.WHATSAPP, "alice")).messages().get(1).text());
-		assertTrue(manager.getConversation(key(ConversationChannel.WHATSAPP, "bob")).messages().isEmpty());
+		assertEquals("Where on Telegram?", manager.getConversation(
+				key(ConversationChannel.TELEGRAM, "alice")).messages().get(1).text());
+		assertTrue(manager.getConversation(key(ConversationChannel.TELEGRAM, "bob")).messages().isEmpty());
 	}
 
 	@Test

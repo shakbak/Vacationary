@@ -1,6 +1,6 @@
 # Vacationary requirements
 
-Requirements for the Channels Challenge, split by service. These describe **what** must be true before design and implementation. They do not prescribe Spring packages, WhatsApp vendors, LLM providers, or data stores.
+Requirements for the Channels Challenge, split by service. These describe **what** must be true before design and implementation. They do not prescribe Spring packages, Telegram Bot API details, LLM providers, or data stores.
 
 ## Product (locked)
 
@@ -15,14 +15,14 @@ A vacation **lodging** recommendation assistant.
 - **Conversation:** hybrid. Accept a full request in one message. If the destination is missing, ask for it (one question at a time). Do not block on optional fields.
 - **Language:** English only.
 - **Results:** 5 options per typical reply. Each option has name, stay type, location/area, price or price range, rating, short why, and an OTA listing link (Booking.com, Airbnb, or similar; real or sample URL).
-- **Channels:** WhatsApp 1:1 chats and a React/TypeScript web chat. Same assistant; conversations are not linked across channels.
+- **Channels:** Telegram 1:1 bot chats and a React/TypeScript web chat. Same assistant; conversations are not linked across channels.
 
 ## Deployable pieces (locked)
 
 | Piece | Kind | Role |
 |---|---|---|
 | Backend core | Java Spring process | Conversations, assistant, recommendation. HTTP contract for callers. |
-| Messaging platforms service | Separate Java process | External messaging platforms. WhatsApp only in v1. Calls the backend; never owns the LLM or catalog. |
+| Messaging platforms service | Separate Java process | External messaging platforms. Telegram only in v1. Calls the backend; never owns the LLM or catalog. |
 | Web client | React/TypeScript | Browser chat. Calls the backend directly, not the messaging service. |
 
 Assistant and recommendation are **not** their own processes; they live in the backend core.
@@ -32,7 +32,7 @@ Assistant and recommendation are **not** their own processes; they live in the b
 | File | Service | Role |
 |---|---|---|
 | [backend.md](backend.md) | Backend core | Conversations, assistant, recommendation, shared API |
-| [messaging.md](messaging.md) | Messaging platforms | Separate Java service; WhatsApp is the only v1 adapter |
+| [messaging.md](messaging.md) | Messaging platforms | Separate Java service; Telegram is the only v1 adapter |
 | [web.md](web.md) | Web client | React/TypeScript chat UI for the same assistant |
 | [system-behavior.md](system-behavior.md) | Whole system | Shared outcomes and turn flow across services |
 

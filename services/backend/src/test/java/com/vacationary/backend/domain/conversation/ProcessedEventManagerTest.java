@@ -50,8 +50,8 @@ class ProcessedEventManagerTest {
 	@Test
 	void saveThenGetEventReturnsTheOutcomeNotATurnResult() {
 		BlAssistantResponse outcome = BlAssistantResponse.clarify("Where would you like to stay?");
-		manager.save(new BlProcessedEvent(eventKey(ConversationChannel.WHATSAPP, "evt-1"), outcome));
-		Optional<BlProcessedEvent> found = manager.getEvent(eventKey(ConversationChannel.WHATSAPP, "evt-1"));
+		manager.save(new BlProcessedEvent(eventKey(ConversationChannel.TELEGRAM, "evt-1"), outcome));
+		Optional<BlProcessedEvent> found = manager.getEvent(eventKey(ConversationChannel.TELEGRAM, "evt-1"));
 		assertTrue(found.isPresent());
 		assertEquals(AssistantResponseKind.CLARIFY, found.get().outcome().kind());
 		assertEquals("Where would you like to stay?", found.get().outcome().text());

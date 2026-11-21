@@ -1,8 +1,8 @@
 # Inbound turn — inner design
 
-Platform-agnostic: one user text in, at most one rendered reply out. WhatsApp types stay in the adapter. HTTP and Graph stay in infra.
+Platform-agnostic: one user text in, at most one rendered reply out. Telegram types stay in the adapter. Backend HTTP stays in infra.
 
-Implement after **render** (pure string) and **backend client**.
+Reuse the existing manager, renderer, and backend client. Only `channel` on `POST /turns` changes (`telegram`). Implement Telegram adapter last.
 
 ## Inner parts
 
@@ -15,12 +15,12 @@ IInboundReplyManager           inbound text → Optional<BlOutboundMessage>
 
 | Part | Responsibility |
 |---|---|
-| `InboundReplyManager` | Domain inbound reply. Guard empty input; ask the backend; skip a duplicate; otherwise render. Returns a reply or empty. Does not parse JSON, open HTTP, or send to WhatsApp. |
-| `HttpBackendClient` | POST JSON `channel=whatsapp`, `externalUserId`, `text`, `eventId`. Network/4xx/5xx → fail result, not an exception the webhook turns into 500. |
+| `InboundReplyManager` | Domain inbound reply. Guard empty input; ask the backend; skip a duplicate; otherwise render. Returns a reply or empty. Does not parse Telegram JSON or call `sendMessage`. |
+| `HttpBackendClient` | POST JSON `channel`, `externalUserId`, `text`, `eventId`. Channel comes from the inbound DTO (`telegram` in v1). Network/4xx/5xx → fail result, not an exception that kills the poller. |
 | `TurnResponseParser` | Map a 200 `/turns` body to `BlTurnResult` (outcome, text, stays, duplicate). Missing/invalid JSON → fail result. |
-| `ReplyRenderer` | `recommend`: intro (tables stripped) plus five stays (name, type words, location, price, rating, why, URL). Other outcomes: assistant `text` only. |
+| `ReplyRenderer` | `recommend`: intro (tables stripped) plus five stays (name, type words, location, price, rating, why, URL). Other outcomes: assistant `text` only. Same English body as before; Telegram autolinks `http` URLs. |
 
-Delivery (`IMessageSender`) is the WhatsApp adapter, not this manager. The adapter sends only when `process` returns a reply.
+Delivery (`IMessageSender`) is the Telegram adapter, not this manager. The adapter sends only when `process` returns a reply.
 
 ## Types
 
@@ -30,9 +30,9 @@ Delivery (`IMessageSender`) is the WhatsApp adapter, not this manager. The adapt
 
 **`BlStayOption`:** same fields as backend `ApiStayOption` (this service copies JSON; it does not import backend packages).
 
-**`BlOutboundMessage`:** `to` (platform user id), `body` (rendered English).
+**`BlOutboundMessage`:** `to` (Telegram user / chat id as decimal string), `body` (rendered English).
 
-WhatsApp is what *calls* this manager (controller → parse → `process` → maybe send). The full Meta → Graph path is in [whatsapp.md](whatsapp.md).
+Telegram is what *calls* this manager (poller → parse → `process` → maybe send). The Bot API path is in [telegram.md](telegram.md).
 
 ## How a turn runs
 
@@ -45,7 +45,7 @@ InboundReplyManager.process(inbound)
   return BlOutboundMessage(inbound.externalUserId, body)
 ```
 
-Backend already ignores duplicate `eventId` (B-15). Returning empty here is what stops a **second user-visible** WhatsApp message.
+Backend already ignores duplicate `eventId` (B-15). Returning empty here is what stops a **second user-visible** Telegram message.
 
 Fail copy when the backend cannot be reached: `The assistant could not complete that turn. Please retry.` That is still a reply (the adapter sends it).
 

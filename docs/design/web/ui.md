@@ -100,5 +100,5 @@ Session reuse is tested in the session/chat layer, not here.
 ## Out of this layer
 
 - `fetch`, sessionStorage, event ids
-- WhatsApp, login, maps, voice, Hebrew
+- Telegram, login, maps, voice, Hebrew
 - Progress/cancel, photos, account linking

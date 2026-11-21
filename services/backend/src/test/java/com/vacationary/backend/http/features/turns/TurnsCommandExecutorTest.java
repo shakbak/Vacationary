@@ -75,10 +75,10 @@ class TurnsCommandExecutorTest {
 	void sameEventIdOnAnotherChannelIsANewTurn() {
 		assistant.replyWith(BlAssistantResponse.clarify("web"));
 		executor.execute(command(ConversationChannel.WEB, "alice", "Rome", "evt-1"));
-		assistant.replyWith(BlAssistantResponse.clarify("whatsapp"));
-		BlTurnResult result = executor.execute(command(ConversationChannel.WHATSAPP, "alice", "Rome", "evt-1"));
+		assistant.replyWith(BlAssistantResponse.clarify("telegram"));
+		BlTurnResult result = executor.execute(command(ConversationChannel.TELEGRAM, "alice", "Rome", "evt-1"));
 		assertFalse(result.duplicate());
-		assertEquals("whatsapp", result.response().text());
+		assertEquals("telegram", result.response().text());
 		assertEquals(2, assistant.captured.size());
 	}
 

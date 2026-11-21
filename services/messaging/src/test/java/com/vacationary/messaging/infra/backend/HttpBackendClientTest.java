@@ -34,7 +34,7 @@ class HttpBackendClientTest {
 						MediaType.APPLICATION_JSON));
 		HttpBackendClient client = new HttpBackendClient("http://backend", new ObjectMapper(), builder.build());
 		BlTurnResult result = client.postTurn(
-				new BlInboundMessage(Channels.WHATSAPP, "1555", "Rome", "wamid.1"));
+				new BlInboundMessage(Channels.TELEGRAM, "4242", "Rome", "9001"));
 		assertEquals("recommend", result.outcome());
 		assertEquals("Here you go.", result.text());
 		assertFalse(result.duplicate());
@@ -50,7 +50,7 @@ class HttpBackendClientTest {
 				.andRespond(MockRestResponseCreators.withServerError());
 		HttpBackendClient client = new HttpBackendClient("http://backend", new ObjectMapper(), builder.build());
 		BlTurnResult result = client.postTurn(
-				new BlInboundMessage(Channels.WHATSAPP, "1555", "Rome", "wamid.1"));
+				new BlInboundMessage(Channels.TELEGRAM, "4242", "Rome", "9001"));
 		assertEquals("fail", result.outcome());
 		assertEquals(ReplyCopy.BACKEND_UNREACHABLE, result.text());
 		assertTrue(result.recommendations().isEmpty());

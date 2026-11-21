@@ -15,7 +15,7 @@ class TurnsSchemaValidatorTest {
 	@Test
 	void validRequestPasses() {
 		assertDoesNotThrow(() -> validator.validate(new ApiTurnRequest("web", "alice", "Rome", "evt-1")));
-		assertDoesNotThrow(() -> validator.validate(new ApiTurnRequest("WHATSAPP", "alice", "Rome", "evt-1")));
+		assertDoesNotThrow(() -> validator.validate(new ApiTurnRequest("TELEGRAM", "alice", "Rome", "evt-1")));
 	}
 
 	@Test

@@ -1,6 +1,6 @@
 # Web client
 
-Lightweight React and TypeScript chat UI. Users message the **same** assistant as on WhatsApp, through the shared backend. This client renders conversations; it does not search stays or call the LLM.
+Lightweight React and TypeScript chat UI. Users message the **same** assistant as on Telegram, through the shared backend. This client renders conversations; it does not search stays or call the LLM.
 
 Product behavior matches the assistant and recommendation rules in [backend.md](backend.md): English, destination required, optional extras, five lodging results with OTA links.
 
@@ -11,8 +11,8 @@ Product behavior matches the assistant and recommendation rules in [backend.md](
 - WEB-01. The web client SHALL be a React application written in TypeScript.
 - WEB-02. The interface SHALL be small and usable. Usability matters more than visual complexity.
 - WEB-03. The client SHALL talk to the shared backend contract (B-04–B-06) **directly**. It SHALL NOT call the messaging platforms service, implement a second assistant, a second conversation store, or its own stay search.
-- WEB-04. A web conversation SHALL use channel = web and an external user id that identifies this browser session. It SHALL NOT use a WhatsApp id.
-- WEB-05. Connecting a web user to a WhatsApp user is **not required**. History is not shared across those channels.
+- WEB-04. A web conversation SHALL use channel = web and an external user id that identifies this browser session. It SHALL NOT use a Telegram id.
+- WEB-05. Connecting a web user to a Telegram user is **not required**. History is not shared across those channels.
 
 ### Conversation UI
 
@@ -67,7 +67,7 @@ Usability is a must-have (WEB-02, assignment item 2). These rules keep the small
 
 - Result cards with photos.
 - Progress during a long search; a cancel control.
-- Starting on WhatsApp and continuing on the web (account/session linking).
+- Starting on Telegram and continuing on the web (account/session linking).
 - Handling a second typed message while a reply is still loading (v1 forbids send during load instead).
 - A dedicated “new conversation” button (the user can already say “start over” in chat).
 - UI for room type or occupancy split (v1: user can type it; backend treats it as nice-to-have).
@@ -75,7 +75,7 @@ Usability is a must-have (WEB-02, assignment item 2). These rules keep the small
 ## Not a requirement
 
 - Login, user accounts, or profiles.
-- Sharing history with WhatsApp.
+- Sharing history with Telegram.
 - Booking or payments.
 - Voice, image, or map input.
 - Pixel-perfect or highly branded design.
@@ -88,4 +88,4 @@ Usability is a must-have (WEB-02, assignment item 2). These rules keep the small
 - Send “cheaper ones” and see a new 5 still about Rome, with previous turns still visible and the new cards scrolled into view.
 - If the LLM/search fails, see an error in the transcript with a next step, then send again. If the HTTP call fails, see status near the composer, the draft still in the box, then send again.
 - Narrow viewport: composer remains usable; latest reply is not hidden behind it.
-- The same trip on WhatsApp is a different conversation; the web UI does not show it.
+- The same trip on Telegram is a different conversation; the web UI does not show it.

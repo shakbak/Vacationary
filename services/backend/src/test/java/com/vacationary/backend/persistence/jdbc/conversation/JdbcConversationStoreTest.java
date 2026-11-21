@@ -44,7 +44,7 @@ class JdbcConversationStoreTest {
 		store.save(row);
 		assertEquals("Rome", store.find(new BlConversationKey(ConversationChannel.WEB, "alice")).orElseThrow()
 				.messages().getFirst().text());
-		assertTrue(store.find(new BlConversationKey(ConversationChannel.WHATSAPP, "alice")).isEmpty());
+		assertTrue(store.find(new BlConversationKey(ConversationChannel.TELEGRAM, "alice")).isEmpty());
 		assertTrue(store.find(new BlConversationKey(ConversationChannel.WEB, "bob")).isEmpty());
 	}
 

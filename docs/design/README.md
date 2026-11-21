@@ -30,12 +30,12 @@ Build order: api → session → chat → ui.
 
 ## Messaging platforms
 
-Separate Spring process. WhatsApp Cloud API only in v1. Calls the backend; renders outcomes as English WhatsApp text.
+Separate Spring process. Telegram Bot API only in v1. Calls the backend; renders outcomes as English Telegram text.
 
-Build order: render → backend client → inbound reply manager → WhatsApp adapter → webhook.
+Build order: render → backend client → inbound reply manager → Telegram adapter (long poll).
 
 | File | Inner design of |
 |---|---|
 | [messaging/overview.md](messaging/overview.md) | Process boundary, layers, port 8081 |
 | [messaging/inbound.md](messaging/inbound.md) | Inbound reply manager, backend client, response parser, renderer |
-| [messaging/whatsapp.md](messaging/whatsapp.md) | End-to-end WhatsApp flow, webhook verify/parse, Graph send |
+| [messaging/telegram.md](messaging/telegram.md) | End-to-end Telegram flow, getUpdates, sendMessage |

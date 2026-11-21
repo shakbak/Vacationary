@@ -24,8 +24,8 @@ class InboundReplyManagerTest {
 	@Test
 	void returnsRenderedReplyWhenBackendSucceeds() {
 		Optional<BlOutboundMessage> outbound = manager.process(
-				new BlInboundMessage(Channels.WHATSAPP, "15551234567", "a hotel", "wamid.1"));
-		assertEquals("15551234567", outbound.orElseThrow().to());
+				new BlInboundMessage(Channels.TELEGRAM, "4242", "a hotel", "9001"));
+		assertEquals("4242", outbound.orElseThrow().to());
 		assertEquals("Where would you like to stay?", outbound.orElseThrow().body());
 	}
 
@@ -35,7 +35,7 @@ class InboundReplyManagerTest {
 				inbound -> new BlTurnResult("clarify", "Where would you like to stay?", List.of(), true),
 				new ReplyRenderer());
 		assertTrue(duplicates.process(
-				new BlInboundMessage(Channels.WHATSAPP, "15551234567", "a hotel", "wamid.1")).isEmpty());
+				new BlInboundMessage(Channels.TELEGRAM, "4242", "a hotel", "9001")).isEmpty());
 	}
 
 	@Test
@@ -45,7 +45,7 @@ class InboundReplyManagerTest {
 				new ReplyRenderer());
 		assertEquals(
 				ReplyCopy.BACKEND_UNREACHABLE,
-				failing.process(new BlInboundMessage(Channels.WHATSAPP, "15551234567", "Rome", "wamid.1"))
+				failing.process(new BlInboundMessage(Channels.TELEGRAM, "4242", "Rome", "9001"))
 						.orElseThrow()
 						.body());
 	}
@@ -53,7 +53,7 @@ class InboundReplyManagerTest {
 	@Test
 	void skipsBlankInbound() {
 		assertTrue(manager.process(null).isEmpty());
-		assertTrue(manager.process(new BlInboundMessage(Channels.WHATSAPP, "", "hi", "wamid.1")).isEmpty());
-		assertTrue(manager.process(new BlInboundMessage(Channels.WHATSAPP, "1555", "  ", "wamid.1")).isEmpty());
+		assertTrue(manager.process(new BlInboundMessage(Channels.TELEGRAM, "", "hi", "9001")).isEmpty());
+		assertTrue(manager.process(new BlInboundMessage(Channels.TELEGRAM, "4242", "  ", "9001")).isEmpty());
 	}
 }

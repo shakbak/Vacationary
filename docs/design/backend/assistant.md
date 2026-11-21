@@ -88,6 +88,6 @@ IOpenAiChatMapper ← OpenAiChatMapper
 
 ## Out of this domain
 
-- Persistence, HTTP JSON, WhatsApp
+- Persistence, HTTP JSON, Telegram
 - A stored destination/filter snapshot beside the messages
 - Extra tools, streaming, room-type schema (nice to have)

@@ -59,7 +59,7 @@ Processed turn, including `outcome: fail` and duplicates → **200**. LLM/search
 RouteHandler
   SchemaValidator: channel, externalUserId, text, eventId present
   TurnsRequestMapper: ApiTurnRequest → BlTurnCommand
-       (channel lowercased; no WhatsApp fields)
+       (channel lowercased; no Telegram fields)
   TurnsCommandExecutor.execute(bl):
        eventKey = BlEventKey(bl.conversation.channel, bl.eventId)
        existing = IProcessedEventManager.getEvent(eventKey)
@@ -99,5 +99,5 @@ Same pattern for history. Bootstrap registers those beans.
 
 - Calling `IStayManager`, `ILlmManager`, or `ILlmClient`
 - Assembling `BlMessage` rows (conversation `saveTurn` does that)
-- WhatsApp webhooks, buttons, signatures
+- Telegram Bot API, buttons, signatures
 - Login, rate limits, streaming

@@ -1,6 +1,6 @@
 # Backend service design
 
-Java Spring process at `services/backend`. One process, four domains. Callers: web client and messaging service. This process never talks to WhatsApp.
+Java Spring process at `services/backend`. One process, four domains. Callers: web client and messaging service. This process never talks to the Telegram Bot API.
 
 Implement **recommendation → assistant → conversation → HTTP**.
 
@@ -13,7 +13,7 @@ Every domain uses the same kinds of parts. Spring `@Configuration` binds each in
 | **DTO (`Bl*`)** | Business types the managers speak | HTTP JSON, persistence rows |
 | **DTO (`Api*`)** | HTTP JSON only | Used inside managers |
 | **Interface** | Port another domain or infra must implement | A concrete engine |
-| **Manager** | Orchestrates one domain’s rules; depends only on interfaces | SQL, HTTP, WhatsApp, an LLM SDK |
+| **Manager** | Orchestrates one domain’s rules; depends only on interfaces | SQL, HTTP, Telegram, an LLM SDK |
 | **Repository** | Load/save domain data | Business rules |
 | **Mapper** | `Db*` ↔ `Bl*`, or `Api*` ↔ `Bl*` | Rules |
 | **In-memory stub** | Repository (or provider) that holds maps/lists in process | Production DB (not required) |

@@ -37,7 +37,7 @@ class JdbcProcessedEventStoreTest {
 		store.save(new DbProcessedEvent(
 				ConversationChannel.WEB, "evt-1", AssistantResponseKind.CLARIFY, "Where?", List.of()));
 		assertEquals("Where?", store.find(new BlEventKey(ConversationChannel.WEB, "evt-1")).orElseThrow().text());
-		assertTrue(store.find(new BlEventKey(ConversationChannel.WHATSAPP, "evt-1")).isEmpty());
+		assertTrue(store.find(new BlEventKey(ConversationChannel.TELEGRAM, "evt-1")).isEmpty());
 		assertTrue(store.find(new BlEventKey(ConversationChannel.WEB, "evt-2")).isEmpty());
 	}
 

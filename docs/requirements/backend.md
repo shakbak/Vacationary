@@ -1,6 +1,6 @@
 # Backend core
 
-Shared Java Spring backend used by the **web client** and by the **messaging platforms service**. This service owns conversations, user isolation, the assistant, and recommendation search. It does not own messaging-platform webhooks or how a message looks on WhatsApp.
+Shared Java Spring backend used by the **web client** and by the **messaging platforms service**. This service owns conversations, user isolation, the assistant, and recommendation search. It does not own messaging-platform updates or how a message looks on Telegram.
 
 This is a **different Java process** from the messaging platforms service ([messaging.md](messaging.md)). Assistant and recommendation run **inside this process**, not as their own services.
 
@@ -10,7 +10,7 @@ This is a **different Java process** from the messaging platforms service ([mess
 
 - B-01. The backend SHALL be a Java Spring application.
 - B-02. The backend SHALL be the single assistant backend for all channels. The web client and the messaging platforms service SHALL call the same conversation and assistant flow, not separate bots.
-- B-03. External messaging-platform integration (parse webhook, send WhatsApp/Telegram/etc.) SHALL live in the messaging platforms service, not in this backend. The web UI SHALL live in the React client. This backend SHALL NOT depend on WhatsApp (or other platform) SDKs or payload types.
+- B-03. External messaging-platform integration (receive updates, send Telegram replies, and any later platform) SHALL live in the messaging platforms service, not in this backend. The web UI SHALL live in the React client. This backend SHALL NOT depend on Telegram (or other platform) SDKs or payload types.
 - B-04. The backend SHALL expose a channel-agnostic application contract so a new web screen or a new messaging-platform adapter can be added without changing how conversations, the LLM, or stay search work.
 - B-05. That contract SHALL accept: channel identifier, external user id, inbound text, and a delivery/event id for idempotency.
 - B-06. That contract SHALL return: assistant-facing text plus the structured recommendation payload defined under Recommendation below (or a clarification/error outcome with no results).
@@ -19,8 +19,8 @@ This is a **different Java process** from the messaging platforms service ([mess
 
 - B-07. The backend SHALL support follow-up messages in the same conversation. A later message such as “cheaper” or “near the beach” SHALL be handled with prior turns available as context.
 - B-08. The backend SHALL isolate conversations by channel + external user id. User A MUST NOT see or affect User B’s history, context, or recommendations.
-- B-09. One WhatsApp user SHALL map to one conversation (1:1). There is no Slack-style thread model for the WhatsApp channel.
-- B-10. Connecting the same person’s WhatsApp conversation to a web conversation is **not required**. Do not build account linking unless chosen later.
+- B-09. One Telegram user SHALL map to one conversation (1:1). There is no Slack-style thread model for the Telegram channel.
+- B-10. Connecting the same person’s Telegram conversation to a web conversation is **not required**. Do not build account linking unless chosen later.
 
 ### Storage
 
@@ -29,8 +29,8 @@ This is a **different Java process** from the messaging platforms service ([mess
 
 ### Failures and tests
 
-- B-13. If the LLM or the recommendation tool fails, the backend SHALL still produce a user-visible failure outcome (not a hang or empty success). Delivery onto WhatsApp is the messaging service’s job after that.
-- B-14. That outcome SHALL say what happened and how to proceed (for example retry, rephrase, or try later). Platform wording on WhatsApp is specified in [messaging.md](messaging.md).
+- B-13. If the LLM or the recommendation tool fails, the backend SHALL still produce a user-visible failure outcome (not a hang or empty success). Delivery onto Telegram is the messaging service’s job after that.
+- B-14. That outcome SHALL say what happened and how to proceed (for example retry, rephrase, or try later). Platform wording on Telegram is specified in [messaging.md](messaging.md).
 - B-15. Duplicate inbound events with the same delivery/event id SHALL NOT create a second assistant run or a second logical reply.
 - B-16. The backend SHALL be testable for conversation isolation between two users.
 - B-17. The backend SHALL be testable for follow-up context (second message uses the first).
@@ -44,7 +44,7 @@ LLM-backed assistant that understands English lodging requests, keeps conversati
 - A-01. The assistant SHALL use an LLM to understand the user and to compose the reply.
 - A-02. The assistant SHALL have **at least one tool**: lodging search, as specified under Recommendation below.
 - A-03. A simple single-agent loop is sufficient. Multiple agents and advanced orchestration are not required.
-- A-04. The assistant SHALL be channel-agnostic. It consumes conversation history + latest user text and produces a structured outcome. It SHALL NOT format WhatsApp (or other messaging-platform) protocol payloads. Those belong in the messaging platforms service.
+- A-04. The assistant SHALL be channel-agnostic. It consumes conversation history + latest user text and produces a structured outcome. It SHALL NOT format Telegram (or other messaging-platform) protocol payloads. Those belong in the messaging platforms service.
 - A-05. The assistant SHALL read and write **English only**. Non-English input is outside the product; it may reply in English that it only supports English.
 - A-06. If the user includes a destination in one message (with or without extras), the assistant SHALL search and recommend in that turn. It SHALL NOT ask a full questionnaire first.
 - A-07. If destination is missing or too vague to search (“somewhere warm”, “a hotel”), the assistant SHALL ask **one** clarifying question for the destination and wait. It SHALL NOT ask dates, budget, or number of people in that same message as a requirement.
@@ -84,7 +84,7 @@ Stay-search logic that turns a request into five lodging options with OTA links.
 ## Nice to have (not committed)
 
 - Durable DB-backed conversations.
-- Linking WhatsApp and web sessions for the same person.
+- Linking Telegram and web sessions for the same person.
 - Progress events during a long search; cancel in-flight work; streaming the reply.
 - Multi-instance session sharing.
 - Buttons / quick replies as input (channel concern; assistant still sees text or an equivalent intent).
@@ -102,15 +102,15 @@ Stay-search logic that turns a request into five lodging options with OTA links.
 - Payments, booking completion, commissions, or storing card data.
 - Admin UI, analytics, or rate-limit product features.
 - Guaranteed persistence after restart (unless you later drop in-memory).
-- Matching a WhatsApp user to a web user.
-- Talking to the WhatsApp API (that is the messaging service).
+- Matching a Telegram user to a web user.
+- Talking to the Telegram Bot API (that is the messaging service).
 - Multilingual replies or a full intake form before every search.
 - Multi-agent orchestration.
 - Covering every hotel in a city, or guaranteeing sample OTA links are live bookable pages.
 
 ## Acceptance
 
-- Two different users (including two WhatsApp users, via the messaging service) can talk at once and never receive each other’s context.
+- Two different users (including two Telegram users, via the messaging service) can talk at once and never receive each other’s context.
 - “Find me a hotel in Rome” → 5 lodging options with links, no extra required questions.
 - “I need a place to stay” → one question: where? After “Rome” → 5 options.
 - “Rome, 12–15 March, under $150, hostel” → 5 options using those filters.
@@ -119,4 +119,4 @@ Stay-search logic that turns a request into five lodging options with OTA links.
 - Given a city with no curated data, the user still gets 5 sample lodging options for that city, not an error.
 - LLM or tool outage → English error that says what failed and to retry, not a fake list.
 - Replaying the same inbound event id does not duplicate the assistant reply.
-- The web client and the messaging service can both call the same contract without WhatsApp types leaking into assistant logic.
+- The web client and the messaging service can both call the same contract without Telegram types leaking into assistant logic.

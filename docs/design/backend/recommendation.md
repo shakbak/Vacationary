@@ -79,7 +79,7 @@ Tests can bind a fake `IStayManager` (assistant tests) or a fake `IStayRepositor
 
 ## Out of this domain
 
-- HTTP, WhatsApp, LLM
+- HTTP, Telegram, LLM
 - Asking for destination
 - Room type / occupancy-split fields (nice to have)
 - Photos, live availability

@@ -32,7 +32,7 @@ Key: `vacationary.web.userId` in **`sessionStorage`**.
 
 - First visit in this tab: create a UUID, store it, use it.
 - Refresh: reuse the same id (WEB-21).
-- New tab: empty `sessionStorage` → new user (WEB-20). Not a WhatsApp id. No linking (WEB-05).
+- New tab: empty `sessionStorage` → new user (WEB-20). Not a Telegram id. No linking (WEB-05).
 
 Each `POST /turns` uses a new `eventId` (`crypto.randomUUID`). The composer is disabled while loading, so double-submit is not the web path. A retry after HTTP failure is a **new** event id (the previous turn never reached the store).
 
@@ -121,5 +121,5 @@ Tests (this layer): session id reused from `sessionStorage`; send locked while i
 ## Out of this layer
 
 - DOM, CSS, stay-card layout
-- Stay search, LLM, WhatsApp
+- Stay search, LLM, Telegram
 - Photos, cancel, extra intake fields

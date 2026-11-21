@@ -8,17 +8,14 @@ import tools.jackson.databind.ObjectMapper;
 import com.vacationary.messaging.core.interfaces.IBackendClient;
 import com.vacationary.messaging.core.interfaces.IInboundParser;
 import com.vacationary.messaging.core.interfaces.IInboundReplyManager;
-import com.vacationary.messaging.core.interfaces.IMessageSender;
 import com.vacationary.messaging.core.interfaces.IReplyRenderer;
-import com.vacationary.messaging.core.interfaces.IWebhookVerifier;
-import com.vacationary.messaging.core.interfaces.IWhatsAppWebhookHandler;
 import com.vacationary.messaging.domain.inbound.InboundReplyManager;
 import com.vacationary.messaging.domain.render.ReplyRenderer;
 import com.vacationary.messaging.infra.backend.HttpBackendClient;
-import com.vacationary.messaging.infra.whatsapp.WhatsAppCloudClient;
-import com.vacationary.messaging.infra.whatsapp.WhatsAppInboundParser;
-import com.vacationary.messaging.infra.whatsapp.WhatsAppWebhookHandler;
-import com.vacationary.messaging.infra.whatsapp.WhatsAppWebhookVerifier;
+import com.vacationary.messaging.infra.telegram.TelegramBotClient;
+import com.vacationary.messaging.infra.telegram.TelegramInboundParser;
+import com.vacationary.messaging.infra.telegram.TelegramUpdateHandler;
+import com.vacationary.messaging.infra.telegram.TelegramUpdatePoller;
 
 @Configuration
 public class MessagingConfiguration {
@@ -36,12 +33,11 @@ public class MessagingConfiguration {
 	}
 
 	@Bean
-	IMessageSender messageSender(
-			@Value("${vacationary.whatsapp.graph-base-url}") String graphBaseUrl,
-			@Value("${vacationary.whatsapp.access-token:}") String accessToken,
-			@Value("${vacationary.whatsapp.phone-number-id:}") String phoneNumberId,
+	TelegramBotClient telegramBotClient(
+			@Value("${vacationary.telegram.api-base-url}") String apiBaseUrl,
+			@Value("${vacationary.telegram.bot-token:}") String botToken,
 			ObjectMapper objectMapper) {
-		return new WhatsAppCloudClient(graphBaseUrl, accessToken, phoneNumberId, objectMapper);
+		return new TelegramBotClient(apiBaseUrl, botToken, objectMapper);
 	}
 
 	@Bean
@@ -50,22 +46,22 @@ public class MessagingConfiguration {
 	}
 
 	@Bean
-	IInboundParser inboundParser(ObjectMapper objectMapper) {
-		return new WhatsAppInboundParser(objectMapper);
+	IInboundParser inboundParser() {
+		return new TelegramInboundParser();
 	}
 
 	@Bean
-	IWebhookVerifier webhookVerifier(
-			@Value("${vacationary.whatsapp.verify-token:}") String verifyToken) {
-		return new WhatsAppWebhookVerifier(verifyToken);
-	}
-
-	@Bean
-	IWhatsAppWebhookHandler whatsAppWebhookHandler(
-			IWebhookVerifier webhookVerifier,
+	TelegramUpdateHandler telegramUpdateHandler(
 			IInboundParser inboundParser,
 			IInboundReplyManager inboundReplyManager,
-			IMessageSender messageSender) {
-		return new WhatsAppWebhookHandler(webhookVerifier, inboundParser, inboundReplyManager, messageSender);
+			TelegramBotClient telegramBotClient) {
+		return new TelegramUpdateHandler(inboundParser, inboundReplyManager, telegramBotClient);
+	}
+
+	@Bean
+	TelegramUpdatePoller telegramUpdatePoller(
+			@Value("${vacationary.telegram.bot-token:}") String botToken,
+			TelegramUpdateHandler telegramUpdateHandler) {
+		return new TelegramUpdatePoller(botToken, telegramUpdateHandler);
 	}
 }

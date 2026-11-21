@@ -40,7 +40,7 @@ HTTP does not call repositories. Managers do not call each other. The turns exec
 
 ## Types
 
-**`BlConversationKey`:** `channel` (`web` | `whatsapp`) + `externalUserId`. No thread id. No linking channels.
+**`BlConversationKey`:** `channel` (`web` | `telegram`) + `externalUserId`. No thread id. No linking channels.
 
 **`BlEventKey`:** `channel` + `eventId`. One inbound delivery. Same `eventId` on another channel is a different delivery.
 

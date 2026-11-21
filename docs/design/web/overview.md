@@ -1,6 +1,6 @@
 # Web client design
 
-React + TypeScript Vite SPA at `services/web`. One screen: chat with the same assistant as WhatsApp. This client **renders** conversations; it does not search stays, call the LLM, or talk to the messaging platforms service.
+React + TypeScript Vite SPA at `services/web`. One screen: chat with the same assistant as Telegram. This client **renders** conversations; it does not search stays, call the LLM, or talk to the messaging platforms service.
 
 Call the backend **directly**: `POST /turns` and `GET /conversations/{channel}/{externalUserId}`. Always `channel = web`. JSON contract: [backend/http-contract.md](../backend/http-contract.md). Product rules: [docs/requirements/web.md](../../requirements/web.md).
 
@@ -12,7 +12,7 @@ Small layers. No Redux, no Next.js, no login. TypeScript uses ordinary types —
 
 | Layer | What it is | What it is not |
 |---|---|---|
-| **session** | Anonymous web user id in `sessionStorage`; new `eventId` per send | WhatsApp id, account linking, cookies |
+| **session** | Anonymous web user id in `sessionStorage`; new `eventId` per send | Telegram id, account linking, cookies |
 | **api** | Typed `fetch` for turns and history; HTTP vs `fail` outcome | Assistant logic, stay search |
 | **chat** | Load history, send a turn, lock send while in flight | DOM, CSS |
 | **ui** | Transcript, stay cards, composer, loading/error copy | Backend calls of its own |

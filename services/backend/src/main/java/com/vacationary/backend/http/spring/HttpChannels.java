@@ -37,7 +37,7 @@ public final class HttpChannels {
 		}
 		return switch (normalized.toLowerCase(Locale.ROOT)) {
 			case "web" -> ConversationChannel.WEB;
-			case "whatsapp" -> ConversationChannel.WHATSAPP;
+			case "telegram" -> ConversationChannel.TELEGRAM;
 			default -> null;
 		};
 	}
