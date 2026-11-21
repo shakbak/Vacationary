@@ -7,12 +7,12 @@ import org.springframework.context.annotation.Configuration;
 import tools.jackson.databind.ObjectMapper;
 import com.vacationary.messaging.core.interfaces.IBackendClient;
 import com.vacationary.messaging.core.interfaces.IInboundParser;
+import com.vacationary.messaging.core.interfaces.IInboundReplyManager;
 import com.vacationary.messaging.core.interfaces.IMessageSender;
 import com.vacationary.messaging.core.interfaces.IReplyRenderer;
-import com.vacationary.messaging.core.interfaces.ITurnProcessor;
 import com.vacationary.messaging.core.interfaces.IWebhookVerifier;
 import com.vacationary.messaging.core.interfaces.IWhatsAppWebhookHandler;
-import com.vacationary.messaging.domain.inbound.TurnProcessor;
+import com.vacationary.messaging.domain.inbound.InboundReplyManager;
 import com.vacationary.messaging.domain.render.ReplyRenderer;
 import com.vacationary.messaging.infra.backend.HttpBackendClient;
 import com.vacationary.messaging.infra.whatsapp.WhatsAppCloudClient;
@@ -45,11 +45,8 @@ public class MessagingConfiguration {
 	}
 
 	@Bean
-	ITurnProcessor turnProcessor(
-			IBackendClient backendClient,
-			IReplyRenderer replyRenderer,
-			IMessageSender messageSender) {
-		return new TurnProcessor(backendClient, replyRenderer, messageSender);
+	IInboundReplyManager inboundReplyManager(IBackendClient backendClient, IReplyRenderer replyRenderer) {
+		return new InboundReplyManager(backendClient, replyRenderer);
 	}
 
 	@Bean
@@ -67,7 +64,8 @@ public class MessagingConfiguration {
 	IWhatsAppWebhookHandler whatsAppWebhookHandler(
 			IWebhookVerifier webhookVerifier,
 			IInboundParser inboundParser,
-			ITurnProcessor turnProcessor) {
-		return new WhatsAppWebhookHandler(webhookVerifier, inboundParser, turnProcessor);
+			IInboundReplyManager inboundReplyManager,
+			IMessageSender messageSender) {
+		return new WhatsAppWebhookHandler(webhookVerifier, inboundParser, inboundReplyManager, messageSender);
 	}
 }

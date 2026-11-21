@@ -15,7 +15,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import tools.jackson.databind.ObjectMapper;
 import com.vacationary.messaging.core.interfaces.IMessageSender;
-import com.vacationary.messaging.domain.inbound.TurnProcessor;
+import com.vacationary.messaging.domain.inbound.InboundReplyManager;
 import com.vacationary.messaging.domain.render.ReplyRenderer;
 import com.vacationary.messaging.dtos.BlTurnResult;
 import com.vacationary.messaging.infra.whatsapp.WhatsAppInboundParser;
@@ -30,10 +30,10 @@ class WhatsAppWebhookControllerTest {
 			new WhatsAppWebhookHandler(
 					new WhatsAppWebhookVerifier("secret"),
 					new WhatsAppInboundParser(new ObjectMapper()),
-					new TurnProcessor(
+					new InboundReplyManager(
 							inbound -> new BlTurnResult("clarify", "Where would you like to stay?", List.of(), false),
-							new ReplyRenderer(),
-							sender)))).build();
+							new ReplyRenderer()),
+					sender))).build();
 
 	@Test
 	void verifyEchoesChallengeWhenTokenMatches() throws Exception {
