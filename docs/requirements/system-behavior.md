@@ -64,11 +64,12 @@ Every user turn ends in exactly one of these:
 
 **Web**
 
-- React + TypeScript chat with visible history.
-- Loading while the turn is in flight; block send until it finishes.
-- Success shows the reply (and 5 options when present). Clarification is success with a question.
-- HTTP/LLM/tool failure shows the error state; user can send again.
-- Refresh: restore history only if the session and in-memory store still exist; otherwise empty chat.
+- React + TypeScript chat with visible history. Empty state when there are no messages (city is enough to start).
+- Loading while the turn is in flight, visible in the transcript; block send until it finishes; then focus the composer.
+- Success shows the reply (and 5 scannable options with a View listing link when present). Clarification is a normal assistant message, not an error.
+- LLM/tool `fail` is an error **in the transcript**. HTTP/network failure is status **near the composer** with the draft kept; user can send again.
+- Layout: transcript scrolls, composer pinned; usable on a narrow viewport without covering the latest reply.
+- Refresh: restore history only if the session and in-memory store still exist; otherwise empty chat (optional note if history failed to load).
 
 ## Isolation
 

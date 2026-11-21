@@ -32,6 +32,23 @@ Product behavior matches the assistant and recommendation rules in [backend.md](
 - WEB-16. **Error:** if the LLM, recommendation tool, or HTTP call fails, the UI SHALL show an error state that states what happened and how to proceed (retry or rephrase). It SHALL NOT look like a successful list of hotels.
 - WEB-17. After an error, the user SHALL be able to send another message (retry).
 
+### Usability
+
+Usability is a must-have (WEB-02, assignment item 2). These rules keep the small UI easy to scan and recover from. They do **not** add photos, cancel, extra forms, or a new-conversation button.
+
+- WEB-23. When the transcript is empty, the UI SHALL show a short English empty state: this is a lodging assistant; a city is enough to start. It SHALL NOT be a form, a questionnaire, or an error.
+- WEB-24. On HTTP or network failure (turn not saved), the composer SHALL keep the unsent text so the user can retry without retyping. On HTTP 200 (including `fail`), the composer SHALL clear as after a normal send.
+- WEB-25. After a send attempt finishes (success or error), keyboard focus SHALL return to the composer so a follow-up is one keystroke away.
+- WEB-26. The transcript SHALL scroll so the latest user message, loading indicator, assistant reply, or stay cards are in view. The composer SHALL stay visible; it SHALL NOT cover that latest content.
+- WEB-27. The layout SHALL work at a typical laptop width and at a narrow phone-width viewport (~360px): one column, transcript scrolls, composer pinned at the bottom.
+- WEB-28. Loading SHALL be visible **in the transcript** (pending user message plus an in-progress assistant indicator and short copy such as “Finding stays…”). A disabled send button alone is not enough.
+- WEB-29. **Clarify** and **refuse scope** SHALL look like ordinary assistant messages. **`fail` (HTTP 200)** SHALL appear in the transcript as an assistant error (what happened and what to do). **HTTP/network error** SHALL appear as status near the composer (the turn was not saved), not as a fake assistant hotel reply. The three SHALL be distinguishable without relying on color alone (WEB-30).
+- WEB-30. Loading, success, and error SHALL be stated in English text, not color or icons alone.
+- WEB-31. Stay cards SHALL be easy to scan: property **name** most prominent; stay type as ordinary words (Hotel, vacation rental, B&B — not raw enums); location, price, rating, and why readable; OTA URL a clear **View listing** link (or equivalent), opening in a new tab. All five cards visible without a carousel.
+- WEB-32. The composer SHALL have an accessible name (visible label or `aria-label`). Enter sends. While a turn is in flight, both field and button are disabled and the loading copy explains the wait (`aria-busy` or equivalent).
+- WEB-33. An error SHALL stay visible until the user starts the next send (or it is replaced by a new result). It SHALL NOT disappear on its own.
+- WEB-34. If history cannot be loaded (backend restarted or the GET fails), the UI SHALL still start empty with the composer enabled (WEB-21). It MAY show a short non-blocking note that earlier messages could not be loaded. It SHALL NOT block chat behind a full-page error.
+
 ### Language and product rules (same assistant)
 
 - WEB-18. UI copy and chat SHALL be English only.
@@ -66,8 +83,9 @@ Product behavior matches the assistant and recommendation rules in [backend.md](
 
 ## Acceptance
 
-- Open the app, send “Find me a hotel in Rome”, see loading, then 5 stays with type, area, price/range, rating, why, and working OTA links.
-- Send “I need a place to stay”, see a destination question (not an error, not 5 fake hotels), then “Rome”, then 5 results.
-- Send “cheaper ones” and see a new 5 still about Rome, with the previous turns still visible.
-- If the backend/LLM/search fails, see an error with a next step, then send again.
+- Open the app, see the empty-state hint, send “Find me a hotel in Rome”, see a pending bubble and “Finding stays…”, then 5 scannable stays with a View listing link each.
+- Send “I need a place to stay”, see a destination question that looks like a normal reply (not an error, not 5 fake hotels), then “Rome”, then 5 results. Composer focused for the follow-up.
+- Send “cheaper ones” and see a new 5 still about Rome, with previous turns still visible and the new cards scrolled into view.
+- If the LLM/search fails, see an error in the transcript with a next step, then send again. If the HTTP call fails, see status near the composer, the draft still in the box, then send again.
+- Narrow viewport: composer remains usable; latest reply is not hidden behind it.
 - The same trip on WhatsApp is a different conversation; the web UI does not show it.
