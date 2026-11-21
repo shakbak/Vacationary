@@ -71,7 +71,7 @@ public class LlmPromptBuilder implements ILlmPromptBuilder {
 			node.put("location", option.location());
 			node.put("price", option.price());
 			node.put("rating", option.rating());
-			node.put("why", option.why());
+			node.put("highlights", option.why());
 			node.put("url", option.url());
 		}
 		try {
@@ -107,7 +107,13 @@ public class LlmPromptBuilder implements ILlmPromptBuilder {
 				Follow-ups: if the user said "hotels in Lisbon" and later "cheaper", call stay_search with destination Lisbon and a tighter budget. Take destination and filters from earlier messages in this conversation. Do not drop a city already given unless the user names a new city or asks to start over.""";
 
 		static final String NO_INVENTED_STAYS = """
-				Never invent stays. After stay_search returns, write a short English reply that presents those exact five options (name, type, location, price, rating, why, and the OTA URL). Do not add extra properties.""";
+				Never invent stays or change names, prices, ratings, or URLs.
+				After stay_search returns, the product already shows each stay's name, type, location, price, rating, and listing URL on cards. Do not repeat those fields and do not dump a full markdown table of them.
+				Write a short English intro (one or two sentences), then a markdown table with exactly two columns and exactly five data rows: Name | Why it stands out
+				- One row for every stay in the tool result, in that same order
+				- Name must match the stay name from the tool result exactly
+				- Why it stands out is 1-2 original sentences for this traveler, using highlights, neighborhood, and any dates, budget, or party size they mentioned
+				- Do not copy highlights verbatim. Do not write "Requested stay type" or "Not a full match" as the standout.""";
 
 		static final String TEXT_REPLY_PREFIXES = """
 				For replies that do not call a tool you MUST start with CLARIFY: or REFUSE_SCOPE: as shown above.""";

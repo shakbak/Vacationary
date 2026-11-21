@@ -17,4 +17,4 @@ Needs JDK 21+ (`JAVA_HOME` should point at a JDK 21 install).
 
 On Windows, use `mvnw.cmd` instead of `./mvnw`.
 
-Set `VACATIONARY_LLM_API_KEY` for a real LLM. Tests use a fake client and do not call the network.
+The default LLM is **Groq** (OpenAI-compatible). Put the Groq key in a `sec.txt` file at the repo root (gitignored) or set `VACATIONARY_LLM_API_KEY`. Default model is `openai/gpt-oss-20b` (Llama 3.3 70B is no longer on the free tier). Override URL/model with `VACATIONARY_LLM_BASE_URL` and `VACATIONARY_LLM_MODEL` if needed. Tests use a fake client and do not call the network.

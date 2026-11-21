@@ -3,6 +3,7 @@ package com.vacationary.backend.infra.llm;
 import org.springframework.http.MediaType;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestClientResponseException;
 
 import tools.jackson.core.JacksonException;
 import com.vacationary.backend.core.interfaces.assistant.ILlmClient;
@@ -48,6 +49,14 @@ public class HttpLlmClient extends BaseRestClient implements ILlmClient {
 		}
 		catch (JacksonException error) {
 			return new BlLlmResponse.Error("LLM response was not valid JSON");
+		}
+		catch (RestClientResponseException error) {
+			try {
+				return chatMapper.toResponse(error.getResponseBodyAsString());
+			}
+			catch (RuntimeException ignored) {
+				return new BlLlmResponse.Error("LLM request failed");
+			}
 		}
 		catch (RestClientException error) {
 			return new BlLlmResponse.Error("LLM request failed");

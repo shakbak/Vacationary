@@ -27,7 +27,11 @@ services/web
     session/     get or create web user id; new event id
     api/         JSON types + fetch client
     chat/        loadHistory, sendTurn, in-flight lock
-    ui/          App, transcript, stay card, composer
+    ui/          App, Header, Status
+      replyText/   stripReply, whyForStay, markdownTable, numberedStay
+      transcript/  Transcript, Message, EmptyState
+      stay/        StayList, StayCard, stayType
+      composer/    Composer, useComposer
     main.tsx
 ```
 

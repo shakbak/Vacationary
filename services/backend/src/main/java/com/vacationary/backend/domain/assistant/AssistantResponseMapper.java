@@ -41,18 +41,20 @@ public class AssistantResponseMapper {
 	}
 
 	public BlAssistantResponse recommend(BlLlmResponse llmResponse, List<BlStayOption> options) {
+		String text = replyText(llmResponse);
 		List<BlStayOption> copied = new ArrayList<>();
 		for (BlStayOption option : options) {
+			String why = StayWhyParser.whyForStay(text, option.name());
 			copied.add(new BlStayOption(
 					option.name(),
 					option.stayType(),
 					option.location(),
 					option.price(),
 					option.rating(),
-					option.why(),
+					why != null ? why : option.why(),
 					option.url()));
 		}
-		return BlAssistantResponse.recommend(replyText(llmResponse), copied);
+		return BlAssistantResponse.recommend(text, copied);
 	}
 
 	private static String replyText(BlLlmResponse llmResponse) {

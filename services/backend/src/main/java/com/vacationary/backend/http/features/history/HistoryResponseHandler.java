@@ -31,7 +31,8 @@ public class HistoryResponseHandler implements IResponseHandler<BlConversation> 
 			messages.add(new ApiMessage(
 					message.role().name().toLowerCase(Locale.ROOT),
 					message.text(),
-					toApi(message.recommendations())));
+					toApi(message.recommendations()),
+					message.outcomeKind() == null ? null : message.outcomeKind().name().toLowerCase(Locale.ROOT)));
 		}
 		responseWriter.writeJson(response, HttpStatuses.OK, new ApiConversationResponse(messages));
 	}

@@ -1,0 +1,265 @@
+:root {
+	color-scheme: light;
+	--paper: #f3ead9;
+	--ink: #1c1915;
+	--muted: #5c564c;
+	--forest: #1f3d34;
+	--forest-ink: #eef4ef;
+	--clay: #c45c26;
+	--clay-ink: #fff7f0;
+	--card: #fffcf6;
+	--line: #d9cbb3;
+	--fail-bg: #f8ece4;
+	--fail-ink: #6b2e16;
+	--status-bg: #efe4c8;
+	font-family: Outfit, "Segoe UI", sans-serif;
+	font-size: 16px;
+	line-height: 1.45;
+	color: var(--ink);
+	background: var(--paper);
+}
+
+* {
+	box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+	margin: 0;
+	min-height: 100%;
+	height: 100%;
+}
+
+body {
+	background:
+		radial-gradient(1200px 500px at 10% -10%, #e7d7b5 0%, transparent 55%),
+		var(--paper);
+}
+
+.app {
+	display: flex;
+	flex-direction: column;
+	height: 100dvh;
+	max-width: 40rem;
+	margin: 0 auto;
+	padding: 0 1rem;
+}
+
+.header {
+	flex: 0 0 auto;
+	padding: 1rem 0 0.75rem;
+}
+
+.header h1 {
+	margin: 0;
+	font-family: Fraunces, Georgia, serif;
+	font-size: 1.75rem;
+	font-weight: 560;
+	letter-spacing: -0.02em;
+	color: var(--forest);
+}
+
+.header p {
+	margin: 0.15rem 0 0;
+	color: var(--muted);
+	font-size: 0.95rem;
+}
+
+.transcript {
+	flex: 1 1 auto;
+	overflow-y: auto;
+	display: flex;
+	flex-direction: column;
+	gap: 0.75rem;
+	padding: 0.25rem 0 0.75rem;
+}
+
+.empty-state {
+	margin: auto 0;
+	color: var(--muted);
+}
+
+.empty-state p {
+	margin: 0 0 0.4rem;
+}
+
+.bubble {
+	max-width: 92%;
+	padding: 0.7rem 0.9rem;
+	border-radius: 1rem;
+}
+
+.bubble p {
+	margin: 0;
+}
+
+.bubble--user {
+	align-self: flex-end;
+	background: var(--clay);
+	color: var(--clay-ink);
+}
+
+.bubble--assistant {
+	align-self: flex-start;
+	background: var(--card);
+	border: 1px solid var(--line);
+}
+
+.bubble--fail {
+	background: var(--fail-bg);
+	border-color: #e0b59a;
+	color: var(--fail-ink);
+}
+
+.bubble--loading {
+	color: var(--muted);
+}
+
+.bubble__kind {
+	font-weight: 600;
+}
+
+.loading-copy {
+	margin: 0;
+	color: var(--muted);
+}
+
+.stay-list {
+	display: flex;
+	flex-direction: column;
+	gap: 0.65rem;
+	margin-top: 0.75rem;
+}
+
+.stay-card {
+	background: var(--paper);
+	border-left: 3px solid var(--forest);
+	padding: 0.65rem 0.75rem;
+}
+
+.stay-card__name {
+	margin: 0;
+	font-family: Fraunces, Georgia, serif;
+	font-size: 1.05rem;
+	font-weight: 560;
+}
+
+.stay-card__type,
+.stay-card__location,
+.stay-card__meta,
+.stay-card__why {
+	margin: 0.2rem 0 0;
+	font-size: 0.92rem;
+}
+
+.stay-card__why-block {
+	margin-top: 0.2rem;
+}
+
+.stay-card__why--clamp {
+	display: -webkit-box;
+	-webkit-box-orient: vertical;
+	-webkit-line-clamp: 2;
+	overflow: hidden;
+}
+
+.stay-card__toggle {
+	display: inline-block;
+	margin-top: 0.15rem;
+	padding: 0;
+	border: 0;
+	background: none;
+	color: var(--forest);
+	font: inherit;
+	font-size: 0.85rem;
+	font-weight: 600;
+	cursor: pointer;
+}
+
+.stay-card__type,
+.stay-card__meta {
+	color: var(--muted);
+}
+
+.stay-card__link {
+	display: inline-block;
+	margin-top: 0.45rem;
+	color: var(--forest);
+	font-weight: 600;
+}
+
+.dock {
+	flex: 0 0 auto;
+	padding: 0.35rem 0 1rem;
+	background: var(--paper);
+}
+
+.status {
+	margin: 0 0 0.45rem;
+	padding: 0.5rem 0.65rem;
+	background: var(--status-bg);
+	color: var(--ink);
+	font-size: 0.92rem;
+}
+
+.status--error {
+	background: var(--fail-bg);
+	color: var(--fail-ink);
+}
+
+.composer {
+	display: grid;
+	grid-template-columns: 1fr auto;
+	grid-template-areas:
+		"label label"
+		"field send";
+	gap: 0.4rem 0.5rem;
+	align-items: center;
+}
+
+.composer__label {
+	grid-area: label;
+	font-size: 0.85rem;
+	color: var(--muted);
+}
+
+.composer__field {
+	grid-area: field;
+	width: 100%;
+	min-height: 2.6rem;
+	border: 1px solid var(--line);
+	border-radius: 0.7rem;
+	padding: 0.55rem 0.75rem;
+	font: inherit;
+	background: var(--card);
+	color: var(--ink);
+}
+
+.composer__field:disabled,
+.composer__send:disabled {
+	opacity: 0.65;
+}
+
+.composer__send {
+	grid-area: send;
+	min-height: 2.6rem;
+	padding: 0 1rem;
+	border: 0;
+	border-radius: 0.7rem;
+	background: var(--forest);
+	color: var(--forest-ink);
+	font: inherit;
+	font-weight: 600;
+	cursor: pointer;
+}
+
+@media (max-width: 400px) {
+	.app {
+		padding: 0 0.75rem;
+	}
+
+	.bubble {
+		max-width: 100%;
+	}
+}

@@ -43,7 +43,7 @@ public class SampleStayProvider implements IStayProvider {
 					area + ", " + city,
 					StayDates.formatPrice(price, query),
 					String.format(Locale.US, "%.1f", 4.0 + ((seed + i) % 9) / 10.0),
-					why(type, area, city, query, sleeps, price),
+					why(area, query, sleeps, price),
 					"https://www.airbnb.com/rooms/sample-" + slug));
 		}
 		ensureUniqueNames(options);
@@ -81,14 +81,8 @@ public class SampleStayProvider implements IStayProvider {
 		return 80 + ((seed + index * 17) % 180);
 	}
 
-	private static String why(
-			StayType type,
-			String area,
-			String city,
-			BlStaySearchQuery query,
-			int sleeps,
-			int price) {
-		StringBuilder why = new StringBuilder(typeLabel(type) + " in " + area + ", " + city);
+	private static String why(String area, BlStaySearchQuery query, int sleeps, int price) {
+		StringBuilder why = new StringBuilder(area + " stay");
 		appendIfPresent(why, StayDates.staySummary(query));
 		if (query.guestCount() != null) {
 			why.append(". Sleeps ").append(sleeps);
@@ -105,17 +99,6 @@ public class SampleStayProvider implements IStayProvider {
 		if (part != null) {
 			why.append(". ").append(part);
 		}
-	}
-
-	private static String typeLabel(StayType type) {
-		return switch (type) {
-			case HOTEL -> "Hotel";
-			case MOTEL -> "Motel";
-			case VACATION_RENTAL -> "Vacation rental";
-			case HOSTEL -> "Hostel";
-			case BNB -> "B&B";
-			case RESORT -> "Resort";
-		};
 	}
 
 	private static String displayCity(String destination) {

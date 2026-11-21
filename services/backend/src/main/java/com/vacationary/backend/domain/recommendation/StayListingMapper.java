@@ -27,7 +27,7 @@ public class StayListingMapper {
 
 	private static String buildWhy(DbStayListing listing, BlStaySearchQuery query, boolean fullMatch) {
 		List<String> parts = new ArrayList<>();
-		parts.add(typeLabel(listing) + " in " + listing.area() + ", " + listing.cityName());
+		addIfPresent(parts, highlight(listing.amenities()));
 		addIfPresent(parts, StayDates.staySummary(query));
 		if (query.guestCount() != null) {
 			parts.add("Sleeps " + listing.sleeps());
@@ -42,23 +42,23 @@ public class StayListingMapper {
 		if (!fullMatch) {
 			parts.add("Not a full match for this request");
 		}
+		if (parts.isEmpty()) {
+			parts.add(listing.area() + " stay");
+		}
 		return String.join(". ", parts) + ".";
+	}
+
+	private static String highlight(String amenities) {
+		if (amenities == null || amenities.isBlank()) {
+			return null;
+		}
+		String trimmed = amenities.trim().replaceAll("\\s+", " ");
+		return Character.toUpperCase(trimmed.charAt(0)) + trimmed.substring(1);
 	}
 
 	private static void addIfPresent(List<String> parts, String part) {
 		if (part != null) {
 			parts.add(part);
 		}
-	}
-
-	private static String typeLabel(DbStayListing listing) {
-		return switch (listing.stayType()) {
-			case HOTEL -> "Hotel";
-			case MOTEL -> "Motel";
-			case VACATION_RENTAL -> "Vacation rental";
-			case HOSTEL -> "Hostel";
-			case BNB -> "B&B";
-			case RESORT -> "Resort";
-		};
 	}
 }

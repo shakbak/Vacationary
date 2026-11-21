@@ -51,7 +51,7 @@ Processed turn, including `outcome: fail` and duplicates → **200**. LLM/search
 
 ### GET `/conversations/{channel}/{externalUserId}`
 
-**`ApiConversationResponse`:** ordered messages (`role`, `text`, optional recommendations). Unknown key → 200 empty list.
+**`ApiConversationResponse`:** ordered messages (`role`, `text`, optional recommendations, optional `outcome` on assistant turns). Unknown key → 200 empty list.
 
 ## How the parts interact (POST `/turns`)
 

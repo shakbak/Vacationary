@@ -17,6 +17,7 @@ import com.vacationary.backend.domain.assistant.LlmManager;
 import com.vacationary.backend.domain.assistant.LlmPromptBuilder;
 import com.vacationary.backend.domain.assistant.StaySearchParser;
 import com.vacationary.backend.infra.llm.HttpLlmClient;
+import com.vacationary.backend.infra.llm.LlmApiKey;
 import com.vacationary.backend.infra.llm.OpenAiChatMapper;
 
 @Configuration
@@ -33,7 +34,7 @@ public class AssistantConfiguration {
 			@Value("${vacationary.llm.model}") String model,
 			@Value("${vacationary.llm.api-key:}") String apiKey,
 			IOpenAiChatMapper openAiChatMapper) {
-		return new HttpLlmClient(baseUrl, model, apiKey, openAiChatMapper);
+		return new HttpLlmClient(baseUrl, model, LlmApiKey.resolve(apiKey), openAiChatMapper);
 	}
 
 	@Bean

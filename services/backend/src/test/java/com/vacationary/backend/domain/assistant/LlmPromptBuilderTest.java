@@ -32,6 +32,7 @@ class LlmPromptBuilderTest {
 				new BlChatMessage(ChatRole.USER, "cheaper")), "cheaper"));
 		assertTrue(request.includeStaySearchTool());
 		assertTrue(request.systemPrompt().contains("earlier messages"));
+		assertTrue(request.systemPrompt().contains("Why it stands out"));
 		assertEquals(3, request.messages().size());
 		assertInstanceOf(BlLlmMessage.User.class, request.messages().get(0));
 		assertInstanceOf(BlLlmMessage.Assistant.class, request.messages().get(1));
@@ -59,6 +60,8 @@ class LlmPromptBuilderTest {
 		assertInstanceOf(BlLlmMessage.AssistantToolCall.class, second.messages().get(1));
 		BlLlmMessage.Tool tool = assertInstanceOf(BlLlmMessage.Tool.class, second.messages().get(2));
 		assertTrue(tool.content().contains("One"));
+		assertTrue(tool.content().contains("\"highlights\""));
+		assertFalse(tool.content().contains("\"why\":"));
 	}
 
 	private static BlStayOption option(String name) {

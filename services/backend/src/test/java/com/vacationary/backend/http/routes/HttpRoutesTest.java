@@ -126,7 +126,8 @@ class HttpRoutesTest {
 				.andExpect(jsonPath("$.messages.length()").value(2))
 				.andExpect(jsonPath("$.messages[0].role").value("user"))
 				.andExpect(jsonPath("$.messages[0].text").value("hello"))
-				.andExpect(jsonPath("$.messages[1].role").value("assistant"));
+				.andExpect(jsonPath("$.messages[1].role").value("assistant"))
+				.andExpect(jsonPath("$.messages[1].outcome").value("clarify"));
 	}
 
 	@Test

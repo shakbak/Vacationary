@@ -37,9 +37,11 @@ class StayListingMapperTest {
 		assertEquals("Pantheon, Rome", option.location());
 		assertEquals("$175 / night", option.price());
 		assertEquals("4.5", option.rating());
+		assertTrue(option.why().contains("Family kitchen"));
 		assertTrue(option.why().contains("Sleeps 5"));
 		assertTrue(option.why().contains("Requested stay type"));
 		assertFalse(option.why().contains("Not a full match"));
+		assertFalse(option.why().contains("Vacation rental in"));
 	}
 
 	@Test
