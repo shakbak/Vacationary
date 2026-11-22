@@ -24,10 +24,9 @@ Listens on **8081** (process health). Inbound is **long polling**, not a webhook
 
 ## Talk to the bot (reviewers)
 
-1. In Telegram, open [@BotFather](https://t.me/BotFather), send `/newbot`, and copy the bot token.
-2. Set `VACATIONARY_TELEGRAM_BOT_TOKEN` and start backend + this service.
-3. Open `https://t.me/<your_bot_username>` (or search the bot name).
-4. Message in **English**. A city is enough (`Hotels in Barcelona`). Dates, budget, and party size are optional.
+Open [t.me/VacationaryBot](https://t.me/VacationaryBot) or search `@VacationaryBot` in Telegram. Message in **English**. A city is enough (`Hotels in Barcelona`). Dates, budget, and party size are optional.
+
+This process must be running on the review machine (with the backend on 8080). To recreate the bot: [@BotFather](https://t.me/BotFather) `/newbot`, set `VACATIONARY_TELEGRAM_BOT_TOKEN`, start this service.
 
 You should get one Telegram reply from the shared assistant: a clarification question if no city, or five stays with type, area, price, rating, why, and a tappable OTA link. English only.
 
